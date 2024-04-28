@@ -1,0 +1,6 @@
+.da-required::after{
+    content: "\002A";
+    color: $danger;
+    margin-left: 5px;
+    font-weight: bold;
+}

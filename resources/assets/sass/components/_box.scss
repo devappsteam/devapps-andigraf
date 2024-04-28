@@ -1,0 +1,55 @@
+.da-box {
+    position: relative;
+    display: flex;
+    align-items: center;
+    background-color: #fff;
+    border-radius: 0.25rem;
+    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+    padding: 1rem;
+
+    &--column {
+        flex-direction: column;
+        justify-content: initial;
+        align-items: normal;
+    }
+
+    &__header {
+        position: relative;
+        display: flex;
+        flex-wrap: nowrap;
+        align-items: center;
+        justify-content: space-between;
+
+        .da-box__title {
+            font-size: 1.3rem;
+            font-weight: bold;
+        }
+    }
+
+    &__icon {
+        background-color: $secondary-color;
+        border-radius: 50%;
+        padding: 0.6rem;
+        margin-right: 0.9rem;
+
+        & svg,
+        & i {
+            color: #fff;
+            fill: #fff;
+        }
+    }
+
+    &__count {
+        position: relative;
+        font-size: 1.5rem;
+        font-weight: bold;
+        margin-bottom: .2rem;
+        line-height: 1;
+    }
+
+    &__title {
+        font-weight: 600;
+        line-height: 1;
+        font-size: 1.1rem;
+    }
+}

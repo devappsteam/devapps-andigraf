@@ -1,0 +1,48 @@
+.da-header {
+    display: flex;
+    align-items: stretch;
+    background-color: #022534;
+    height: 80px;
+    animation-duration: 0.3s;
+    color: #fff;
+
+    .da-logo {
+        height: 40px;
+    }
+
+    .da-menu {
+        display: flex;
+        padding: 0;
+        margin: 0;
+        list-style: none;
+        width: 100%;
+
+        &__item {
+            display: flex;
+            align-items: center;
+            padding: 0.15rem 0;
+            margin-right: 0.5rem;
+
+            .dropdown:hover .dropdown-menu {
+                display: block;
+                margin-top: 0;
+            }
+        }
+
+        &__link {
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            padding: 0;
+            flex: 0 0 100%;
+            padding: 0.65rem 1rem;
+            transition: none;
+            outline: none;
+            color: #fff;
+            text-decoration: none;
+            border-radius: 0.475rem;
+            background: transparent;
+            font-weight: bold;
+        }
+    }
+}
