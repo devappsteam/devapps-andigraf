@@ -55,7 +55,7 @@ class ProductController extends Controller
 
             if (empty(Auth::user()->associate_id)) {
                 $associates = Associate::distinct()->where('status', 'complete')->orderBy('first_name', 'ASC')->orderBy('corporate_name', 'ASC')->get();
-            }else{
+            } else {
                 $associates = [Associate::where('id', Auth::user()->associate_id)->first()];
             }
 
@@ -78,7 +78,7 @@ class ProductController extends Controller
             $print_processes = PrintProcess::orderBy('name')->get();
             if (empty(Auth::user()->associate_id)) {
                 $associates = Associate::distinct()->where('status', 'complete')->orderBy('first_name', 'ASC')->orderBy('corporate_name', 'ASC')->get();
-            }else{
+            } else {
                 $associates = [Associate::where('id', Auth::user()->associate_id)->first()];
             }
             $awards = Award::orderBy('name')->get();
@@ -144,7 +144,7 @@ class ProductController extends Controller
             $print_processes = PrintProcess::orderBy('name')->get();
             if (empty(Auth::user()->associate_id)) {
                 $associates = Associate::distinct()->where('status', 'complete')->orderBy('first_name', 'ASC')->orderBy('corporate_name', 'ASC')->get();
-            }else{
+            } else {
                 $associates = [Associate::where('id', Auth::user()->associate_id)->first()];
             }
             $awards = Award::orderBy('name')->get();
@@ -306,8 +306,9 @@ class ProductController extends Controller
             dd($ex->getMessage());
         }
     }
-    
-    public function ticket(Request $request){
+
+    public function ticket(Request $request)
+    {
         try {
             $products = Product::select('id', 'name');
 
@@ -327,21 +328,18 @@ class ProductController extends Controller
                 $products = $products->where('award_id', $request->award);
             }
 
-            $products = $products->orderBy('associate_id', 'ASC')->get();
+            $products = $products->orderBy('id', 'ASC')->get();
             $pimaco = new Pimaco('6187');
 
             if (!empty($products)) {
                 foreach ($products as $product) {
-                    for ($count = 0; $count < 4; $count++) {
-                        $tag = new Tag();
-                        $tag->setPadding(1.5);
-                        $tag->p(str_pad($product->id, 4, 0, STR_PAD_LEFT))->b()->setSize(6);
-                        $pimaco->addTag($tag);
-                    }
+                    $tag = new Tag();
+                    $tag->setPadding(1.5);
+                    $tag->p(str_pad($product->id, 4, 0, STR_PAD_LEFT))->b()->setSize(7);
+                    $pimaco->addTag($tag);
                 }
             }
             $pimaco->output();
-
         } catch (Exception $ex) {
             dd($ex->getMessage());
         }
