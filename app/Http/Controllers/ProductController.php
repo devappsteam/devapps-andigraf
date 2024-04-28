@@ -9,6 +9,7 @@ use App\Models\EnrollmentProduct;
 use App\Models\PrintProcess;
 use App\Models\Product;
 use App\Models\ProductCategory;
+use App\Traits\Award as TraitsAward;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -18,6 +19,7 @@ use Proner\PhpPimaco\Tag;
 
 class ProductController extends Controller
 {
+    use TraitsAward;
     /**
      * Display a listing of the resource.
      *
@@ -45,6 +47,8 @@ class ProductController extends Controller
 
             if (isset($request->award) && !empty($request->award)) {
                 $products = $products->where('award_id', $request->award);
+            }else{
+                $products = $products->where('award_id', TraitsAward::active());
             }
 
             if (isset($request->category) && !empty($request->category)) {

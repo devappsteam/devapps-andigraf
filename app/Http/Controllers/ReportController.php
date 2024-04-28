@@ -6,10 +6,14 @@ use App\Models\Associate;
 use App\Models\Award;
 use App\Models\Product;
 use App\Models\ProductCategory;
+use App\Traits\Award as TraitsAward;
 use Illuminate\Http\Request;
 
 class ReportController extends Controller
 {
+
+    use TraitsAward;
+
     public function associates()
     {
         $associates = Associate::orderBy('first_name')->orderby('corporate_name')->get();
@@ -107,6 +111,8 @@ class ReportController extends Controller
 
         if (isset($request->award) && !empty($request->award)) {
             $products = $products->where('award_id', $request->award);
+        } else {
+            $products = $products->where('award_id', TraitsAward::active());
         }
 
         if (isset($request->category) && !empty($request->category)) {
@@ -182,7 +188,7 @@ class ReportController extends Controller
 
         return response()->stream($callback, 200, $headers);
     }
-    
+
     public function votes(Request $request)
     {
         $votes = Associate::select('first_name', 'last_name', 'corporate_name', 'email', 'type', 'votes');

@@ -81,6 +81,7 @@
                         <table class="table table-striped">
                             <thead>
                                 <tr>
+                                    <th>Número</th>
                                     <th>Nome</th>
                                     <th>Cliente</th>
                                     <th>Data de Conclusão</th>
@@ -91,6 +92,7 @@
                             <tbody>
                                 @foreach ($products as $product)
                                     <tr>
+                                        <td>{{ str_pad($product->id, 4, 0, STR_PAD_LEFT) }}</td>
                                         <td>{{ $product->name }}</td>
                                         <td>{{ $product->client }}</td>
                                         <td>{{ $product->conclude }}</td>
