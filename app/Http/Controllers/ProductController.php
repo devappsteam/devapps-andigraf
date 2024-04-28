@@ -336,6 +336,7 @@ class ProductController extends Controller
                     $tag = new Tag();
                     $tag->setPadding(1.5);
                     $tag->p(str_pad($product->id, 4, 0, STR_PAD_LEFT))->b()->setSize(7);
+                    $tag->align = "center";
                     $pimaco->addTag($tag);
                 }
             }
