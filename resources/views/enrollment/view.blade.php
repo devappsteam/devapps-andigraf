@@ -5,7 +5,7 @@
         <div class="row">
             <div class="col-12 d-flex align-items-center justify-content-between">
                 <h3 class="da-page__title">Inscrições</h3>
-                
+
                 <a href="{{ route('enrollment.print', $enrollment->uuid) }}" target="_blank" class="btn btn-primary">Imprimir</a>
             </div>
         </div>
@@ -84,6 +84,7 @@
                                     <thead class="bg-light border-top">
                                         <tr>
                                             <th scope="row" class="border-0">#</th>
+                                            <th scope="row" class="border-0">Nº Produto</th>
                                             <th scope="row" class="border-0 text-left">Produto</th>
                                             <th scope="row" class="border-0">Cliente</th>
                                             <th scope="row" class="border-0">Concluido em</th>
@@ -100,6 +101,7 @@
                                                 @endphp
                                                 <tr>
                                                     <th scope="row">{{ $count }}</th>
+                                                    <th scope="row">{{ str_pad($product->id, 4, 0, STR_PAD_LEFT) }}</th>
                                                     <th scope="row" class="text-left fw-bold h6">{{ $product->name }}</th>
                                                     <td>{{ $product->client }}</td>
                                                     <td>{{ date("d/m/Y", strtotime($product->conclude)) }}</td>

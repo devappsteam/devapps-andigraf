@@ -94,6 +94,7 @@
                                 <table class="table mb-0">
                                     <thead class="bg-light border-top">
                                         <tr>
+                                            <th scope="row" class="border-0">Nº Produto</th>
                                             <th scope="row" class="border-0 text-left">Produto</th>
                                             <th scope="row" class="border-0">Cliente</th>
                                             <th scope="row" class="border-0">Concluido em</th>
@@ -103,6 +104,7 @@
                                         @if ($enrollment->products)
                                         @foreach ($enrollment->products as $product)
                                         <tr>
+                                            <th scope="row">{{ str_pad($product->id, 4, 0, STR_PAD_LEFT) }}</th>
                                             <th scope="row" class="text-left fw-bold h6">{{ $product->name }}</th>
                                             <td>{{ $product->client }}</td>
                                             <td>{{ date("d/m/Y", strtotime($product->conclude)) }}</td>
