@@ -2,12 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use App\Exports\ProductExport;
 use App\Models\Associate;
 use App\Models\Award;
 use App\Models\Product;
 use App\Models\ProductCategory;
 use App\Traits\Award as TraitsAward;
 use Illuminate\Http\Request;
+use Maatwebsite\Excel\Facades\Excel;
 
 class ReportController extends Controller
 {
@@ -119,7 +121,7 @@ class ReportController extends Controller
             $products = $products->where('product_category_id', $request->category);
         }
 
-        $products = $products->orderBy('name', 'ASC')->get();
+        $products = $products->orderBy('id', 'ASC')->get();
 
         $categories = ProductCategory::orderBy('name')->get();
         $awards = Award::orderBy('name')->get();
@@ -129,25 +131,14 @@ class ReportController extends Controller
 
     public function product_export(Request $request)
     {
-        $products = Product::with('categories', 'associate', 'award');
-
-        if (isset($request->associate) && !empty($request->associate)) {
-            $products = $products->where('associate_id', $request->associate);
+        if($request->format == 'pdf'){
+            $fileName = 'produtos_' . date("Ymd") . ".pdf";
+            return Excel::download(new ProductExport($request->all()), $fileName, \Maatwebsite\Excel\Excel::DOMPDF);
         }
+        $fileName = 'produtos_' . date("Ymd") . ".xlsx";
+        return Excel::download(new ProductExport($request->all()), $fileName);
 
-        if (isset($request->search) && !empty($request->search)) {
-            $products = $products->where('name', "LIKE", "%{$request->search}%");
-        }
-
-        if (isset($request->award) && !empty($request->award)) {
-            $products = $products->where('award_id', $request->award);
-        }
-
-        if (isset($request->category) && !empty($request->category)) {
-            $products = $products->where('product_category_id', $request->category);
-        }
-
-        $products = $products->orderBy('name', 'ASC')->get();
+        /*
 
         $fileName = 'productos_' . date("Ymd") . ".csv";
 
@@ -187,6 +178,7 @@ class ReportController extends Controller
         };
 
         return response()->stream($callback, 200, $headers);
+        */
     }
 
     public function votes(Request $request)

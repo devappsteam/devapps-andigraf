@@ -7,7 +7,7 @@
                 <h3 class="da-page__title">Relatório - Produtos</h3>
                 <div class="d-flex">
                     <button class="btn btn-primary" id="btn_filter">Filtrar</button>
-                    <button type="submit" class="btn btn-primary ml-2" form="form_export">Exportar</button>
+                    <button type="button" class="btn btn-primary ml-2" data-toggle="modal" data-target="#export_form">Exportar</button>
                 </div>
             </div>
         </div>
@@ -17,7 +17,7 @@
                     <div class="row">
                         <div class="col-12 col-md-3 form-group">
                             <label for="search">Pesquisar</label>
-                            <input type="text" name="search" id="search" class="form-control" placeholder="Nome do Produto">
+                            <input type="text" name="search" id="search" class="form-control" placeholder="Nome do Produto" value="{{ $_GET['search'] ?? "" }}">
                         </div>
 
                         <div class="col-12 col-md-3 form-group">
@@ -234,14 +234,133 @@
             </div>
         </div>
     </div>
-    <form id="form_export" method="post" action="{{ route('report.product.export') }}">
-        @csrf
-        @method('post')
-        <input type="hidden" name="search" value="{{ isset($_GET['search']) && !empty($_GET['search']) ? $_GET['search'] : "" }}">
-        <input type="hidden" name="associate" value="{{ isset($_GET['associate']) && !empty($_GET['associate']) ? $_GET['associate'] : "" }}">
-        <input type="hidden" name="category" value="{{ isset($_GET['category']) && !empty($_GET['category']) ? $_GET['category'] : "" }}">
-        <input type="hidden" name="award" value="{{ isset($_GET['award']) && !empty($_GET['award']) ? $_GET['award'] : "" }}">
-    </form>
+
+    <!-- Modal -->
+    <div class="modal fade" id="export_form" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Exportar</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form action="{{ route('report.product.export') }}" method="post" id="form_export">
+                        @method('post')
+                        @csrf
+                        <div class="row">
+                            <div class="col-12 form-group">
+                                <label for="search">Pesquisar</label>
+                                <input type="text" name="search" id="search" class="form-control" placeholder="Nome do Produto" value="{{ $_GET['search'] ?? "" }}">
+                            </div>
+
+                            <div class="col-12 col-md-6 form-group">
+                                <label for="associate">Associado</label>
+                                <select name="associate" class="form-control" id="associate">
+                                    <option value="">Selecione...</option>
+                                    @if (isset($associates))
+                                        @foreach ($associates as $associate)
+                                            <option value="{{ $associate->id }}" {{ (isset($_GET['associate']) && $_GET['associate'] == $associate->id) ? "selected" : "" }}>
+                                                @if ($associate->type == "legal")
+                                                    {{ $associate->fantasy_name }}
+                                                @else
+                                                    {{ $associate->first_name }}
+                                                @endif
+                                            </option>
+                                        @endforeach
+                                    @endif
+                                </select>
+                            </div>
+                            <div class="col-12 col-md-6 form-group">
+                                <label for="category">Categorias</label>
+                                <select name="category" class="form-control" id="category">
+                                    <option value="">Selecione...</option>
+                                    @if (isset($categories))
+                                        @foreach ($categories as $category)
+                                            <option value="{{ $category->id }}" {{ (isset($_GET['category']) && $_GET['category'] == $category->id) ? "selected" : "" }}>
+                                                {{ $category->name }}
+                                            </option>
+                                        @endforeach
+                                    @endif
+                                </select>
+                            </div>
+
+                            <div class="col-12 col-md-6 form-group">
+                                <label for="award">Premio</label>
+                                <select name="award" class="form-control" id="award" required>
+                                    <option value="">Selecione...</option>
+                                    @if (isset($awards))
+                                        @foreach ($awards as $award)
+                                            <option value="{{ $award->id }}" {{ (isset($_GET['award']) && $_GET['award'] == $award->id) ? "selected" : "" }}>
+                                                {{ $award->name }}
+                                            </option>
+                                        @endforeach
+                                    @endif
+                                </select>
+                            </div>
+
+                            <div class="col-12 col-md-6 form-group">
+                                <label for="award">Formato</label>
+                                <select name="format" class="form-control" id="format" required>
+                                    <option value="excel">Excel</option>
+                                    <option value="pdf">PDF</option>
+                                </select>
+                            </div>
+                            <div class="col-12 col-md-6 form-group">
+                                <label for="columns" class="w-100">Campos</label>
+
+                                <div class="custom-control custom-checkbox">
+                                    <input type="checkbox" class="custom-control-input" name="columns[]" id="p_number" value="number" checked>
+                                    <label class="custom-control-label" for="p_number">Número do Produto</label>
+                                </div>
+                                <div class="custom-control custom-checkbox">
+                                    <input type="checkbox" class="custom-control-input" name="columns[]" id="p_award" value="award" checked>
+                                    <label class="custom-control-label" for="p_award">Premiação</label>
+                                </div>
+                                <div class="custom-control custom-checkbox">
+                                    <input type="checkbox" class="custom-control-input" name="columns[]" id="p_associate" value="associate" checked>
+                                    <label class="custom-control-label" for="p_associate">Associado</label>
+                                </div>
+                                <div class="custom-control custom-checkbox">
+                                    <input type="checkbox" class="custom-control-input" name="columns[]" id="p_category" value="category" checked>
+                                    <label class="custom-control-label" for="p_category">Categoria</label>
+                                </div>
+                                <div class="custom-control custom-checkbox">
+                                    <input type="checkbox" class="custom-control-input" name="columns[]" id="p_name" value="name" checked>
+                                    <label class="custom-control-label" for="p_name">Nome</label>
+                                </div>
+                                <div class="custom-control custom-checkbox">
+                                    <input type="checkbox" class="custom-control-input" name="columns[]" id="p_client" value="client" checked>
+                                    <label class="custom-control-label" for="p_client">Cliente</label>
+                                </div>
+                                <div class="custom-control custom-checkbox">
+                                    <input type="checkbox" class="custom-control-input" name="columns[]" id="p_conclude" value="conclude" checked>
+                                    <label class="custom-control-label" for="p_conclude">Data de Conclusão</label>
+                                </div>
+                                <div class="custom-control custom-checkbox">
+                                    <input type="checkbox" class="custom-control-input" name="columns[]" id="p_special_features" value="special_features">
+                                    <label class="custom-control-label" for="p_special_features">Recursos Especiais</label>
+                                </div>
+                                <div class="custom-control custom-checkbox">
+                                    <input type="checkbox" class="custom-control-input" name="columns[]" id="p_substrate" value="substrate">
+                                    <label class="custom-control-label" for="p_substrate">Substrato</label>
+                                </div>
+                                <div class="custom-control custom-checkbox">
+                                    <input type="checkbox" class="custom-control-input" name="columns[]" id="p_note" value="note">
+                                    <label class="custom-control-label" for="p_note">Notas</label>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                    <button type="submit" form="form_export" class="btn btn-primary">Exportar</button>
+                </div>
+            </div>
+        </div>
+  </div>
 @endsection
 
 @push('scripts')

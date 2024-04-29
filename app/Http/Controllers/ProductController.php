@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Exports\ProductExport;
 use App\Models\Associate;
 use App\Models\Award;
 use App\Models\Enrollment;
@@ -14,6 +15,7 @@ use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
+use Maatwebsite\Excel\Facades\Excel;
 use Proner\PhpPimaco\Pimaco;
 use Proner\PhpPimaco\Tag;
 
@@ -250,62 +252,13 @@ class ProductController extends Controller
     public function export(Request $request)
     {
         try {
-            $products = Product::with([
-                'associate:id,first_name,fantasy_name,type',
-                'award:id,name'
-            ]);
-
-            if (isset($request->associate) && !empty($request->associate)) {
-                $products = $products->where('associate_id', $request->associate);
+            if($request->format == 'pdf'){
+                $fileName = 'produtos_' . date("Ymd") . ".pdf";
+                return Excel::download(new ProductExport($request->all()), $fileName, \Maatwebsite\Excel\Excel::DOMPDF);
             }
+            $fileName = 'produtos_' . date("Ymd") . ".xlsx";
+            return Excel::download(new ProductExport($request->all()), $fileName);
 
-            if (isset($request->search) && !empty($request->search)) {
-                $products = $products->where('name', 'LIKE', "%{$request->search}%");
-            }
-
-            if (isset($request->category) && !empty($request->category)) {
-                $products = $products->where('product_category_id', $request->category);
-            }
-
-            if (isset($request->award) && !empty($request->award)) {
-                $products = $products->where('award_id', $request->award);
-            }
-
-            $products = $products->orderBy('associate_id', 'ASC')->get();
-
-            $fileName = 'produtos_' . date("Ymd") . ".csv";
-
-            $headers = array(
-                "Content-type"        => "text/csv",
-                "Content-Disposition" => "attachment; filename=$fileName",
-                "Pragma"              => "no-cache",
-                "Cache-Control"       => "must-revalidate, post-check=0, pre-check=0",
-                "Expires"             => "0"
-            );
-
-            $columns = array('Produto', 'Associado', 'Data de Conclusão');
-
-            $callback = function () use ($products, $columns) {
-                $file = fopen('php://output', 'w');
-                fputcsv($file, $columns);
-
-                foreach ($products as $product) {
-                    if ($product->associate->type == "legal") {
-                        $associate = $product->associate->fantasy_name;
-                    } else {
-                        $associate = $product->associate->first_name;
-                    }
-                    $row['Produto']  = $product->name;
-                    $row['Associado']    = $associate;
-                    $row['Data de Conclusão']    = date("d/m/Y", strtotime($product->conclude));
-
-                    fputcsv($file, array($row['Produto'], $row['Associado'], $row['Data de Conclusão']));
-                }
-
-                fclose($file);
-            };
-
-            return response()->stream($callback, 200, $headers);
         } catch (Exception $ex) {
             dd($ex->getMessage());
         }

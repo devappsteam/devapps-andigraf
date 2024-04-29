@@ -53,6 +53,9 @@
                                     <div class="col-12 text-center">
                                         <button type="submit" class="btn btn-primary w-100">Entrar</button>
                                     </div>
+                                    <div class="col-12 text-center">
+                                        <a href="{{ route('associate.public.index') }}" class="btn btn-success fon w-100 mt-3">Associar-se</a>
+                                    </div>
                                 </div>
                             </form>
                         </div>
