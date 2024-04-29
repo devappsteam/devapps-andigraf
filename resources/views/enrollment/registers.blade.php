@@ -56,7 +56,7 @@
                                                 @endforeach
                                             @endforeach
                                         @endif
-                                        <h2>{{ $product->name }}</h2>
+                                        <h2>{{ str_pad($product->id, 4, '0', STR_PAD_LEFT) }} - {{ $product->name }}</h2>
                                         <h5><b>Cliente:</b> {{ $product->client }}</h5>
                                         <h5><b>Concluido em:</b> {{ date('d/m/Y', strtotime($product->conclude)) }}</h5>
                                         <h5><b>Categoria:</b> {{ $category_name }}</h5>

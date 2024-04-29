@@ -8,6 +8,7 @@ use App\Models\Enrollment;
 use App\Models\EnrollmentNote;
 use App\Models\PrintProcess;
 use App\Models\ProductCategory;
+use App\Traits\Award as TraitsAward;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -16,6 +17,8 @@ use Illuminate\Support\Str;
 
 class EnrollmentController extends Controller
 {
+    use TraitsAward;
+
     /**
      * Display a listing of the resource.
      *
@@ -43,6 +46,8 @@ class EnrollmentController extends Controller
 
             if (isset($request->award) && !empty($request->award)) {
                 $enrollments = $enrollments->where('award_id', $request->award);
+            }else{
+                $enrollments = $enrollments->where('award_id', TraitsAward::active());
             }
 
             $enrollments = $enrollments->orderBy('created_at', 'DESC')->paginate(15);
@@ -211,8 +216,8 @@ class EnrollmentController extends Controller
             return redirect()->back()->with('alert-danger', 'Falha ao deletar, tente mais tarde.');
         }
     }
-    
-    
+
+
     /**
      * Print the specified resource from storage.
      *
@@ -237,7 +242,7 @@ class EnrollmentController extends Controller
             return redirect()->back()->with('alert-danger', 'Falha ao deletar, tente mais tarde.');
         }
     }
-    
+
     /**
      * Print the specified resource from storage.
      *
