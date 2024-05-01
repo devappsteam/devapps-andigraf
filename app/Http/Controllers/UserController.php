@@ -17,7 +17,7 @@ class UserController extends Controller
     public function index()
     {
         try {
-            $users = User::orderBy('name', 'DESC')->paginate(15);
+            $users = User::whereNull('associate_id')->orderBy('name', 'ASC')->paginate(15);
             return view('user.index', compact('users'));
         } catch (Exception $ex) {
             dd($ex->getMessage());

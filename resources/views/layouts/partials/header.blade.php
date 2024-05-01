@@ -50,9 +50,10 @@
                             <a href="{{ route('associate.profile') }}" class="da-menu__link" alt="Associados">Meu Cadastro</a>
                         @else
                             <div class="dropdown">
-                                <a href="{{ route('associate.index') }}" class="da-menu__link dropdown-toggle" alt="Associados">Associados</a>
+                                <a href="javascript:void(0);" class="da-menu__link dropdown-toggle" alt="Associados">Associados</a>
                                 <div class="dropdown-menu dropdown-menu-right">
-                                    <a class="dropdown-item" href="{{ route('associate.newsletter') }}">Newsletter</a>
+                                    <a href="{{ route('associate.index') }}" class="dropdown-item" alt="Associados">Associados</a>
+                                    <a href="{{ route('associate.newsletter') }}" class="dropdown-item" alt="Newsletter">Newsletter</a>
                                 </div>
                             </div>
                         @endif

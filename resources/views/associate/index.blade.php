@@ -58,6 +58,7 @@
                         <table class="table da-table table-striped">
                             <thead>
                                 <tr>
+                                    <th>Número</th>
                                     <th>Associado</th>
                                     <th>CPF|CNPJ</th>
                                     <th>Status</th>
@@ -68,6 +69,7 @@
                             <tbody>
                                 @foreach ($associates as $associate )
                                 <tr>
+                                    <td>{{ str_pad($associate->id, 8, 0, STR_PAD_LEFT) }}</td>
                                     <td>
                                         @if ($associate->type == "legal")
                                             <p class="text-truncate m-0">{{ ucwords($associate->corporate_name) }}</p>

@@ -92,7 +92,7 @@
                             <tbody>
                                 @foreach ($products as $product)
                                     <tr>
-                                        <td>{{ str_pad($product->id, 4, 0, STR_PAD_LEFT) }}</td>
+                                        <td>{{ str_pad($product->id, 8, 0, STR_PAD_LEFT) }}</td>
                                         <td>{{ $product->name }}</td>
                                         <td>{{ $product->client }}</td>
                                         <td>{{ $product->conclude }}</td>

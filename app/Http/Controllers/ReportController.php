@@ -18,7 +18,7 @@ class ReportController extends Controller
 
     public function associates()
     {
-        $associates = Associate::orderBy('first_name')->orderby('corporate_name')->get();
+        $associates = Associate::orderBy('first_name')->orderby('corporate_name')->paginate(15);
         return view('report.associate', compact('associates'));
     }
 

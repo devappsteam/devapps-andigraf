@@ -101,7 +101,7 @@
                                                 @endphp
                                                 <tr>
                                                     <th scope="row">{{ $count }}</th>
-                                                    <th scope="row">{{ str_pad($product->id, 4, 0, STR_PAD_LEFT) }}</th>
+                                                    <th scope="row">{{ str_pad($product->id, 8, 0, STR_PAD_LEFT) }}</th>
                                                     <th scope="row" class="text-left fw-bold h6">{{ $product->name }}</th>
                                                     <td>{{ $product->client }}</td>
                                                     <td>{{ date("d/m/Y", strtotime($product->conclude)) }}</td>

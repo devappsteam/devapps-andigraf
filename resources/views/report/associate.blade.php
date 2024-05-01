@@ -1,7 +1,7 @@
 @extends('layouts.default')
 
 @section('content')
-    <div class="da-page container py-5">
+    <div class="da-page container pt-5 pb-3">
         <div class="row">
             <div class="col-12 d-flex align-items-center justify-content-between">
                 <h3 class="da-page__title">Relatório - Associados</h3>
@@ -15,29 +15,10 @@
                         <table class="table table-striped">
                             <thead>
                                 <tr>
-                                    <th>CPNJ</th>
-                                    <th>Razao Social</th>
-                                    <th>Nome Fantazia</th>
-                                    <th>Inscrição Estadual</th>
-                                    <th>Inscrição Municipal</th>
-                                    <th>Telefone</th>
-                                    <th>E-mail</th>
-                                    <th>WhatsApp</th>
-                                    <th>Responsável</th>
-                                    <th>Reponsável Telefone</th>
-                                    <th>Responsável E-mail</th>
-                                    <th>Responsável Cargo</th>
-                                    <th>Facebook</th>
-                                    <th>Instagram</th>
-                                    <th>Twitter</th>
-                                    <th>YouTube</th>
-                                    <th>CEP</th>
-                                    <th>Endereço</th>
                                     <th>Número</th>
-                                    <th>Complemento</th>
-                                    <th>Bairro</th>
-                                    <th>Cidade</th>
-                                    <th>Estado</th>
+                                    <th>CPNJ | CPF</th>
+                                    <th>Nome</th>
+                                    <th>Responsável</th>
                                     <th>Cadastro</th>
                                     <th>Origem</th>
                                 </tr>
@@ -45,29 +26,10 @@
                             <tbody>
                                 @foreach ($associates as $associate)
                                     <tr>
+                                        <td>{{ str_pad($associate->id, 8, 0, STR_PAD_LEFT) }}</td>
                                         <td>{{ $associate->document }}</td>
-                                        <td>{{ $associate->corporate_name }}</td>
-                                        <td>{{ $associate->fantasy_name }}</td>
-                                        <td>{{ $associate->state_registration }}</td>
-                                        <td>{{ $associate->municipal_registration }}</td>
-                                        <td>{{ $associate->phone }}</td>
-                                        <td>{{ $associate->email }}</td>
-                                        <td>{{ $associate->whatsapp }}</td>
+                                        <td>{{ $associate->fantasy_name ?? $associate->first_name}}</td>
                                         <td>{{ $associate->responsible_first_name . " " .  $associate->responsible_last_name  }}</td>
-                                        <td>{{ $associate->responsible_phone }}</td>
-                                        <td>{{ $associate->responsible_email }}</td>
-                                        <td>{{ $associate->responsible_job }}</td>
-                                        <td>{{ $associate->social_facebook }}</td>
-                                        <td>{{ $associate->social_instagram }}</td>
-                                        <td>{{ $associate->social_twitter }}</td>
-                                        <td>{{ $associate->social_youtube }}</td>
-                                        <td>{{ $associate->postcode }}</td>
-                                        <td>{{ $associate->address }}</td>
-                                        <td>{{ $associate->number }}</td>
-                                        <td>{{ $associate->complement }}</td>
-                                        <td>{{ $associate->district }}</td>
-                                        <td>{{ $associate->city }}</td>
-                                        <td>{{ $associate->state }}</td>
                                         <td>
                                             @if ($associate->status == "complete")
                                                 Completo
@@ -219,4 +181,5 @@
             </div>
         </div>
     </div>
+    @include('components.paginator', ['data' => $associates])
 @endsection

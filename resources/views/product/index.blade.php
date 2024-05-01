@@ -107,7 +107,7 @@
                             <tbody>
                                 @foreach ($products as $product)
                                     <tr>
-                                        <td>{{ str_pad($product->id, 4, 0, STR_PAD_LEFT) }}</td>
+                                        <td>{{ str_pad($product->id, 8, 0, STR_PAD_LEFT) }}</td>
                                         <td class="text-truncate">{{ $product->name }}</td>
                                         <td class="text-truncate">
                                             @if ($product->associate->type == 'legal')
