@@ -15,6 +15,7 @@ class ProductCategory extends Model
      * @var array<int, string>
      */
     protected $fillable = [
+        'segment_id',
         'uuid',
         'name',
         'description',
@@ -27,5 +28,10 @@ class ProductCategory extends Model
     public function products()
     {
         return $this->hasMany(Product::class);
+    }
+
+    public function segment()
+    {
+        return $this->belongsTo(Segment::class);
     }
 }

@@ -8,6 +8,7 @@ use App\Http\Controllers\ProductCategoryController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\RateController;
 use App\Http\Controllers\ReportController;
+use App\Http\Controllers\SegmentController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Storage;
@@ -59,6 +60,15 @@ Route::middleware('auth')->group(function () {
         Route::post('/salvar', [ProductCategoryController::class, 'store'])->name('product.category.store');
         Route::put('/atualizar/{uuid}', [ProductCategoryController::class, 'update'])->name('product.category.update');
         Route::delete('/apagar', [ProductCategoryController::class, 'delete'])->name('product.category.delete');
+    });
+
+    Route::prefix('/segmentos')->group(function () {
+        Route::get('/', [SegmentController::class, 'index'])->name('segment.index');
+        Route::get('/adicionar', [SegmentController::class, 'create'])->name('segment.create');
+        Route::get('/editar/{uuid}', [SegmentController::class, 'edit'])->name('segment.edit');
+        Route::post('/salvar', [SegmentController::class, 'store'])->name('segment.store');
+        Route::put('/atualizar/{uuid}', [SegmentController::class, 'update'])->name('segment.update');
+        Route::delete('/apagar', [SegmentController::class, 'delete'])->name('segment.delete');
     });
 
     Route::prefix('/taxas/{award}')->group(function () {

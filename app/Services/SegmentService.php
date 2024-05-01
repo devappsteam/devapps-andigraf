@@ -2,23 +2,22 @@
 
 namespace App\Services;
 
-use App\Models\Product;
-use App\Models\ProductCategory;
+use App\Models\Segment;
 use Exception;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 
-class ProductCategoryService
+class SegmentService
 {
 
-    public function list(int $perpage = 10)
+    public function list(int $perpage = 15)
     {
-        return ProductCategory::with('segment')->paginate($perpage);
+        return Segment::paginate($perpage);
     }
 
     public function all()
     {
-        return ProductCategory::with('segment')->all();
+        return Segment::all();
     }
 
     public function get(string $uuid)
@@ -28,12 +27,12 @@ class ProductCategoryService
                 abort(404, 'Código enviado é inválido.');
             }
 
-            if (!$productCategory = ProductCategory::where('uuid', $uuid)->first()) {
+            if (!$Segment = Segment::where('uuid', $uuid)->first()) {
                 abort(404, 'Registro não encontrado.');
             }
-            return $productCategory;
+            return $Segment;
         } catch (Exception $ex) {
-            Log::error('Falha ao buscar categoria do produto.', array(
+            Log::error('Falha ao buscar segmento.', array(
                 'error' => $ex->getMessage(),
                 'uuid' => $uuid
             ));
@@ -44,15 +43,14 @@ class ProductCategoryService
     public function store(array $data): bool
     {
         try {
-            $productCategory = new ProductCategory();
-            $productCategory->uuid = Str::uuid()->toString();
-            $productCategory->segment_id = $data['segment'];
-            $productCategory->name = $data['name'];
-            $productCategory->description = $data['description'];
-            $productCategory->save();
+            $Segment = new Segment();
+            $Segment->uuid = Str::uuid()->toString();
+            $Segment->name = $data['name'];
+            $Segment->description = $data['description'];
+            $Segment->save();
             return true;
         } catch (Exception $ex) {
-            Log::error('Falha ao cadastrar categoria do produto.', array(
+            Log::error('Falha ao cadastrar segmento.', array(
                 'error' => $ex->getMessage(),
                 'payload' => $data
             ));
@@ -63,14 +61,13 @@ class ProductCategoryService
     public function update(string $uuid, array $data): bool
     {
         try {
-            $productCategory = $this->get($uuid);
-            $productCategory->segment_id = $data['segment'];
-            $productCategory->name = $data['name'];
-            $productCategory->description = $data['description'];
-            $productCategory->save();
+            $Segment = $this->get($uuid);
+            $Segment->name = $data['name'];
+            $Segment->description = $data['description'];
+            $Segment->save();
             return true;
         } catch (Exception $ex) {
-            Log::error('Falha ao atualizar categoria do produto.', array(
+            Log::error('Falha ao atualizar segmento.', array(
                 'error' => $ex->getMessage(),
                 'payload' => $data,
                 'uuid' => $uuid
@@ -82,11 +79,11 @@ class ProductCategoryService
     public function delete(string $uuid): bool
     {
         try {
-            $productCategory = $this->get($uuid);
-            $productCategory->delete();
+            $Segment = $this->get($uuid);
+            $Segment->delete();
             return true;
         } catch (Exception $ex) {
-            Log::error('Falha ao atualizar categoria do produto.', array(
+            Log::error('Falha ao atualizar segmento.', array(
                 'error' => $ex->getMessage(),
                 'uuid' => $uuid
             ));

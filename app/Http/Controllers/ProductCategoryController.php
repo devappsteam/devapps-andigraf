@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Services\ProductCategoryService;
+use App\Services\SegmentService;
 use Exception;
 use Illuminate\Http\Request;
 
@@ -10,10 +11,12 @@ class ProductCategoryController extends Controller
 {
 
     protected $productCategory;
+    protected $segments;
 
-    public function __construct(ProductCategoryService $productCategory)
+    public function __construct(ProductCategoryService $productCategory, SegmentService $segments)
     {
         $this->productCategory = $productCategory;
+        $this->segments = $segments;
     }
 
     /**
@@ -34,7 +37,8 @@ class ProductCategoryController extends Controller
      */
     public function create()
     {
-        return view('product-category.create');
+        $segments = $this->segments->all();
+        return view('product-category.create', compact('segments'));
     }
 
     /**
@@ -60,8 +64,9 @@ class ProductCategoryController extends Controller
      */
     public function edit(string $uuid)
     {
+        $segments = $this->segments->all();
         $data = $this->productCategory->get($uuid);
-        return view('product-category.edit', compact('data'));
+        return view('product-category.edit', compact('data', 'segments'));
     }
 
     /**

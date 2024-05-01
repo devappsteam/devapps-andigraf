@@ -4,8 +4,8 @@
     <div class="da-page container pt-5 pb-3">
         <div class="row">
             <div class="col-12 d-flex align-items-center justify-content-between">
-                <h3 class="da-page__title">Categorias de Produtos</h3>
-                <a href="{{ route('product.category.create') }}" class="btn btn-primary font-weight-bold" title="Cadastrar Categoria">Cadastrar Categoria</a>
+                <h3 class="da-page__title">Segmentos</h3>
+                <a href="{{ route('segment.create') }}" class="btn btn-primary font-weight-bold" title="Cadastrar Categoria">Cadastrar Segmento</a>
             </div>
         </div>
         <div class="row">
@@ -20,18 +20,16 @@
                         <table class="table da-table table-striped">
                             <thead>
                                 <tr>
-                                    <th>Categoria</th>
                                     <th>Segmento</th>
                                     <th width="200" class="text-right">Opções</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                @foreach ($data as $category )
+                                @foreach ($data as $segment )
                                 <tr>
-                                    <td>{{ $category->name }}</td>
-                                    <td>{{ $category->segment->name ?? "--" }}</td>
+                                    <td>{{ $segment->name }}</td>
                                     <td class="text-right">
-                                        <a href="{{ route('product.category.edit', $category->uuid) }}" class="btn btn-primary btn-sm">
+                                        <a href="{{ route('segment.edit', $segment->uuid) }}" class="btn btn-primary btn-sm">
                                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
                                                 fill="currentColor" class="bi bi-pencil-square" viewBox="0 0 16 16">
                                                 <path
@@ -40,7 +38,7 @@
                                                     d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5v11z" />
                                             </svg>
                                         </a>
-                                        <button type="button" class="btn btn-danger btn-sm delete" data-delete="{{ $category->uuid }}">
+                                        <button type="button" class="btn btn-danger btn-sm delete" data-delete="{{ $segment->uuid }}">
                                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
                                                 fill="currentColor" class="bi bi-trash" viewBox="0 0 16 16">
                                                 <path
@@ -183,10 +181,10 @@
 
     @include('components.paginator', ['data' => $data])
 
-    <form id="form_delete" method="post" action="{{ route('product.category.delete') }}">
+    <form id="form_delete" method="post" action="{{ route('segment.delete') }}">
         @csrf
         @method('delete')
-        <input type="hidden" name="category" id="category_delete" value="">
+        <input type="hidden" name="segment" id="segment_delete" value="">
     </form>
 @endsection
 
@@ -205,7 +203,7 @@
                     cancelButtonText: `Não`,
                 }).then((result) => {
                     if (result.isConfirmed) {
-                        $('#form_delete').find('#category_delete').val(button.data('delete'));
+                        $('#form_delete').find('#segment_delete').val(button.data('delete'));
                         $('#form_delete').submit();
                     }
                 })
