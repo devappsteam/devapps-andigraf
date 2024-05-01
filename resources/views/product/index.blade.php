@@ -18,7 +18,7 @@
             </div>
         </div>
         <div class="row">
-            <div class="col-12 mt-4">
+            <div class="col-12 my-1">
                 @include('layouts.partials.alerts')
             </div>
         </div>

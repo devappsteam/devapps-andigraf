@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Associate;
 use App\Models\User;
+use App\Services\UserService;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
@@ -11,13 +12,20 @@ use Illuminate\Support\Str;
 
 class UserController extends Controller
 {
+    protected $user;
+
+    public function __construct(UserService $user)
+    {
+        $this->user = $user;
+    }
+
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
         try {
-            $users = User::whereNull('associate_id')->orderBy('name', 'ASC')->paginate(15);
+            $users = $this->user->list();
             return view('user.index', compact('users'));
         } catch (Exception $ex) {
             dd($ex->getMessage());
@@ -30,8 +38,7 @@ class UserController extends Controller
     public function create()
     {
         try {
-            $associates = Associate::distinct()->where('status', 'complete')->orderBy('first_name', 'ASC')->orderBy('corporate_name', 'ASC')->get();
-            return view('user.create', compact('associates'));
+            return view('user.create');
         } catch (Exception $ex) {
             dd($ex->getMessage());
         }
@@ -43,15 +50,10 @@ class UserController extends Controller
     public function store(Request $request)
     {
         try {
-            $user = new User();
-            $user->uuid = Str::uuid()->toString();
-            $user->name = $request->name;
-            $user->email = $request->email;
-            $user->password = Hash::make($request->password);
-            $user->associate_id = (isset($request->associate) && !empty($request->associate)) ? $request->associate : null;
-            $user->save();
-
-            return redirect(route('user.index'))->with('alert-success', 'Usuário cadastrado com sucesso!');
+            if ($this->user->store($request->all())) {
+                return redirect(route('user.index'))->with('alert-success', 'Registro inserido com sucesso!');
+            }
+            return redirect()->back()->with('alert-danger', 'Ops! Não foi possivel processar sua solicitação, contate o administrador.');
         } catch (Exception $ex) {
             dd($ex->getMessage());
         }
@@ -64,14 +66,14 @@ class UserController extends Controller
     {
         try {
             if (!Str::isUuid($uuid)) {
-                return redirect()->back()->with('alert-error', 'Usuário inválido ou inexistente.');
+                return redirect()->back()->with('alert-danger', 'Código inválido ou não enviado.');
             }
-            $user = User::where('uuid', $uuid)->first();
-            if (!$user) {
-                return redirect()->back()->with('alert-error', 'Usuário inválido ou inexistente.');
+
+            if (!$user = $this->user->get($uuid)) {
+                return redirect()->back()->with('alert-danger', 'Registro inválido ou inexistente.');
             }
-            $associates = Associate::distinct()->where('status', 'complete')->orderBy('first_name', 'ASC')->orderBy('corporate_name', 'ASC')->get();
-            return view('user.edit', compact('user', 'associates'));
+
+            return view('user.edit', compact('user'));
         } catch (Exception $ex) {
             dd($ex->getMessage());
         }
@@ -80,26 +82,16 @@ class UserController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, String $uuid)
+    public function update(Request $request, string $uuid)
     {
         try {
             if (!Str::isUuid($uuid)) {
-                return redirect()->back()->with('alert-error', 'Usuário inválido ou inexistente.');
+                return redirect()->back()->with('alert-danger', 'Código inválido ou inexistente.');
             }
-            $user = User::where('uuid', $uuid)->first();
-            if (!$user) {
-                return redirect()->back()->with('alert-error', 'Usuário inválido ou inexistente.');
+            if (!$this->user->update($uuid, $request->all())) {
+                return redirect()->back()->with('alert-danger', 'Registro inválido ou inexistente.');
             }
-            $user->name = $request->name;
-            $user->email = $request->email;
-            $user->associate_id = (isset($request->associate) && !empty($request->associate)) ? $request->associate : null;
-
-            if (isset($request->password) && !empty($request->password)) {
-                $user->password = Hash::make($request->password);
-            }
-            $user->save();
-
-            return redirect()->back()->with('alert-success', 'Usuário atualizado com sucesso!');
+            return redirect()->back()->with('alert-success', 'Registro atualizado com sucesso!');
         } catch (Exception $ex) {
             dd($ex->getMessage());
         }
@@ -112,14 +104,12 @@ class UserController extends Controller
     {
         try {
             if (!Str::isUuid($request->user)) {
-                return redirect()->back()->with('alert-error', 'Usuário inválido ou inexistente.');
+                return redirect()->back()->with('alert-danger', 'Código inválido ou inexistente.');
             }
-            $user = User::where('uuid', $request->user)->first();
-            if (!$user) {
-                return redirect()->back()->with('alert-error', 'Usuário inválido ou inexistente.');
-            }
-            $user->delete();
-            return redirect()->back()->with('alert-success', 'Usuário deletado com sucesso!');
+            if (!$this->user->delete($request->user)) {
+                return redirect()->back()->with('alert-danger', 'Usuário inválido ou inexistente.');
+            };
+            return redirect()->route('user.index')->with('alert-success', 'Registro removido com sucesso.');
         } catch (Exception $ex) {
             return redirect()->back()->with('alert-danger', 'Falha ao deletar, tente mais tarde.');
         }

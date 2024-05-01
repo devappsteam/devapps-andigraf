@@ -4,9 +4,11 @@ namespace App\Http\Controllers;
 
 use App\Mail\Newsletter;
 use App\Models\Associate;
+use App\Models\User;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Mail;
 
@@ -22,19 +24,19 @@ class AssociateController extends Controller
         try {
             $associates = Associate::query();
 
-            if(isset($request->search) && !empty($request->search)){
+            if (isset($request->search) && !empty($request->search)) {
                 $associates->where('document', 'LIKE', "%{$request->search}%")
-                ->orWhere('corporate_name', 'LIKE', "%{$request->search}%")
-                ->orWhere('fantasy_name', 'LIKE', "%{$request->search}%")
-                ->orWhere('first_name', 'LIKE', "%{$request->search}%")
-                ->orWhere('email', 'LIKE', "%{$request->search}%");
+                    ->orWhere('corporate_name', 'LIKE', "%{$request->search}%")
+                    ->orWhere('fantasy_name', 'LIKE', "%{$request->search}%")
+                    ->orWhere('first_name', 'LIKE', "%{$request->search}%")
+                    ->orWhere('email', 'LIKE', "%{$request->search}%");
             }
 
-            if(isset($request->status) && !empty($request->status)) {
+            if (isset($request->status) && !empty($request->status)) {
                 $associates->where('status', $request->status);
             }
 
-            if(isset($request->origin) && !empty($request->origin)) {
+            if (isset($request->origin) && !empty($request->origin)) {
                 $associates->where('origin', $request->origin);
             }
 
@@ -138,11 +140,11 @@ class AssociateController extends Controller
     {
         try {
             if (!Str::isUuid($uuid)) {
-                return redirect()->back()->with('alert-error', 'Associado inválido ou inexistente.');
+                return redirect()->back()->with('alert-danger', 'Associado inválido ou inexistente.');
             }
             $associate = Associate::where('uuid', $uuid)->first();
             if (!$associate) {
-                return redirect()->back()->with('alert-error', 'Associado inválido ou inexistente.');
+                return redirect()->back()->with('alert-danger', 'Associado inválido ou inexistente.');
             }
             return view('associate.edit', compact('associate'));
         } catch (Exception $ex) {
@@ -150,7 +152,8 @@ class AssociateController extends Controller
         }
     }
 
-    public function profile(){
+    public function profile()
+    {
         $associate = Associate::where('id', Auth::user()->associate_id)->first();
         return view('associate.edit', compact('associate'));
     }
@@ -166,11 +169,11 @@ class AssociateController extends Controller
     {
         try {
             if (!Str::isUuid($uuid)) {
-                return redirect()->back()->with('alert-error', 'Associado inválido ou inexistente.');
+                return redirect()->back()->with('alert-danger', 'Associado inválido ou inexistente.');
             }
             $associate = Associate::where('uuid', $uuid)->first();
             if (!$associate) {
-                return redirect()->back()->with('alert-error', 'Associado inválido ou inexistente.');
+                return redirect()->back()->with('alert-danger', 'Associado inválido ou inexistente.');
             }
 
             $associate->document = ($request->type == "legal") ? preg_replace("/\D/", "", $request->corporate_document) : preg_replace("/\D/", "", $request->personal_document);
@@ -225,11 +228,11 @@ class AssociateController extends Controller
     {
         try {
             if (!Str::isUuid($request->associate)) {
-                return redirect()->back()->with('alert-error', 'Associado inválido ou inexistente.');
+                return redirect()->back()->with('alert-danger', 'Associado inválido ou inexistente.');
             }
             $associate = Associate::where('uuid', $request->associate)->first();
             if (!$associate) {
-                return redirect()->back()->with('alert-error', 'Associado inválido ou inexistente.');
+                return redirect()->back()->with('alert-danger', 'Associado inválido ou inexistente.');
             }
             $associate->delete();
             return redirect()->back()->with('alert-success', 'Associado deletado com sucesso!');
@@ -292,8 +295,8 @@ class AssociateController extends Controller
             dd($ex->getMessage());
         }
     }
-    
-    
+
+
     public function newsletter()
     {
         try {
@@ -321,6 +324,56 @@ class AssociateController extends Controller
                 }
             }
             return redirect()->back()->with('alert-success', 'E-mail enviado com sucesso!');
+        } catch (Exception $ex) {
+            dd($ex->getMessage());
+        }
+    }
+
+    public function user(string $uuid)
+    {
+        try {
+            if (!Str::isUuid($uuid)) {
+                return redirect()->back()->with('alert-danger', 'Associado inválido ou inexistente.');
+            }
+            $associate = Associate::with('user')->where('uuid', $uuid)->first();
+            if (!$associate) {
+                return redirect()->back()->with('alert-danger', 'Associado inválido ou inexistente.');
+            }
+            return view('associate.user.index', compact('associate'));
+        } catch (Exception $ex) {
+            dd($ex->getMessage());
+        }
+    }
+
+    public function user_update(Request $request, string $uuid)
+    {
+        try {
+            if (!Str::isUuid($uuid)) {
+                return redirect()->back()->with('alert-danger', 'Associado inválido ou inexistente.');
+            }
+            $associate = Associate::where('uuid', $uuid)->first();
+            if (!$associate) {
+                return redirect()->back()->with('alert-danger', 'Associado inválido ou inexistente.');
+            }
+
+            if (!isset($request->user) || empty($request->user)) {
+                $user = new User();
+                $user->uuid = Str::uuid()->toString();
+                $user->associate_id = $associate->id;
+                $user->name = $request->name;
+                $user->email = $request->email;
+                $user->password = Hash::make($request->password);
+                $user->save();
+            } else {
+                $user = User::where('uuid', $request->user)->first();
+                $user->name = $request->name;
+                $user->email = $request->email;
+                if ($request->password) {
+                    $user->password = Hash::make($request->password);
+                }
+                $user->save();
+            }
+            return redirect()->back()->with('alert-success', 'Usuário salvo com sucesso.');
         } catch (Exception $ex) {
             dd($ex->getMessage());
         }

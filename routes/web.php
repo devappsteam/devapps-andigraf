@@ -85,6 +85,8 @@ Route::middleware('auth')->group(function () {
         Route::post('/salvar', [AssociateController::class, 'store'])->name('associate.store');
         Route::put('/atualizar/{uuid}', [AssociateController::class, 'update'])->name('associate.update');
         Route::delete('/apagar', [AssociateController::class, 'delete'])->name('associate.delete');
+        Route::get('/usuario/{uuid}', [AssociateController::class, 'user'])->name('associate.user.index');
+        Route::post('/usuario/{uuid}', [AssociateController::class, 'user_update'])->name('associate.user.update');
         Route::get('/newsletter', [AssociateController::class, 'newsletter'])->name('associate.newsletter');
         Route::post('/newsletter/send', [AssociateController::class, 'send_mail'])->name('associate.newsletter.send');
     });

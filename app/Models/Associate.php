@@ -9,8 +9,14 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 class Associate extends Model
 {
     use HasFactory, SoftDeletes;
-    
-    public function product(){
+
+    public function product()
+    {
         return $this->hasMany(Product::class);
+    }
+
+    public function user()
+    {
+        return $this->hasOne(User::class);
     }
 }
