@@ -19,7 +19,7 @@ class CreateEnrollmentsTable extends Migration
             $table->foreignId('award_id')->constrained('awards');
             $table->foreignId('associate_id')->constrained('associates');
             $table->enum('payment_type', array('credit_card', 'pix'))->default('credit_card');
-            $table->enum('status', array('pending', 'approve', 'on-hold', 'cancelled', 'refunded', 'failed'))->default('pending');
+            $table->enum('status', array('pending', 'approve', 'on-hold', 'cancelled', 'refunded', 'failed', 'draft'))->default('draft');
             $table->decimal('discount', 15, 2)->default(0);
             $table->decimal('subtotal', 15, 2)->default(0);
             $table->decimal('total', 15, 2)->default(0);

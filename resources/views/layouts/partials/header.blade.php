@@ -37,7 +37,9 @@
                                     <a class="dropdown-item" href="{{ route('award.index') }}">Premiações</a>
                                 @endif
                                 <a class="dropdown-item" href="{{ route('product.index') }}">Produtos</a>
-                                <a class="dropdown-item" href="{{ route('segment.index') }}">Segmentos</a>
+                                @if(empty(Auth::user()->associate_id))
+                                    <a class="dropdown-item" href="{{ route('segment.index') }}">Segmentos</a>
+                                @endif
                             </div>
                         </div>
                         <!-- end: Menu link -->

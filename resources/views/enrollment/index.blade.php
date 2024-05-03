@@ -7,9 +7,7 @@
                 <h3 class="da-page__title">Inscrições</h3>
                 <div class="d-flex">
                     <button class="btn btn-primary" id="btn_filter">Filtrar</button>
-                    @if(empty(Auth::user()->associate_id))
-                    <a href="{{ route('enrollment.create') }}" class="btn btn-primary font-weight-bold ml-2" title="Cadastrar Inscrição">Cadastrar Inscrição</a>
-                    @endif
+                    <a href="{{ route('enrollment.create') }}" class="btn btn-primary font-weight-bold ml-2" title="Cadastrar Inscrição">Fazer Inscrição</a>
                 </div>
             </div>
         </div>
@@ -96,8 +94,11 @@
                                     <td>R$ {{ number_format($enrollment->total, 2, ',', '.') }}</td>
                                     <td>
                                         @switch($enrollment->status)
-                                            @case('pending')
+                                            @case('draft')
                                             @default
+                                                <span class="badge badge-info">Em Criação</span>
+                                            @break
+                                            @case('pending')
                                                 <span class="badge badge-primary">Pendente</span>
                                             @break
                                             @case('approve')
@@ -119,6 +120,7 @@
                                         @endswitch
                                     </td>
                                     <td class="text-right">
+                                        @if($enrollment->status != 'draft')
                                         <a href="{{ route('enrollment.registers', $enrollment->uuid) }}" class="btn btn-primary btn-sm" target="_blank">
                                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-card-checklist" viewBox="0 0 16 16">
                                                 <path d="M14.5 3a.5.5 0 0 1 .5.5v9a.5.5 0 0 1-.5.5h-13a.5.5 0 0 1-.5-.5v-9a.5.5 0 0 1 .5-.5h13zm-13-1A1.5 1.5 0 0 0 0 3.5v9A1.5 1.5 0 0 0 1.5 14h13a1.5 1.5 0 0 0 1.5-1.5v-9A1.5 1.5 0 0 0 14.5 2h-13z"/>
@@ -131,7 +133,8 @@
                                                 <path d="M0 8s3-5.5 8-5.5S16 8 16 8s-3 5.5-8 5.5S0 8 0 8zm8 3.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7z"/>
                                             </svg>
                                         </a>
-                                        @if(empty(Auth::user()->associate_id))
+                                        @endif
+                                        @if(empty(Auth::user()->associate_id) || $enrollment->status == 'draft')
                                         <a href="{{ route('enrollment.edit', $enrollment->uuid) }}" class="btn btn-primary btn-sm">
                                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
                                                 fill="currentColor" class="bi bi-pencil-square" viewBox="0 0 16 16">

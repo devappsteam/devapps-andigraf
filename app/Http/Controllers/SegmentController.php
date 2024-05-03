@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Services\SegmentService;
 use Exception;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class SegmentController extends Controller
 {
@@ -23,6 +24,9 @@ class SegmentController extends Controller
      */
     public function index()
     {
+        if(!empty(Auth::user()->associate_id)){
+            abort(403, 'Acesso não autorizado');
+        }
         $data = $this->segment->list();
         return view('segment.index', compact('data'));
     }
@@ -34,6 +38,9 @@ class SegmentController extends Controller
      */
     public function create()
     {
+        if(!empty(Auth::user()->associate_id)){
+            abort(403, 'Acesso não autorizado');
+        }
         return view('segment.create');
     }
 
@@ -45,6 +52,9 @@ class SegmentController extends Controller
      */
     public function store(Request $request)
     {
+        if(!empty(Auth::user()->associate_id)){
+            abort(403, 'Acesso não autorizado');
+        }
         if ($this->segment->store($request->all())) {
             return redirect(route('segment.index'))->with('alert-success', 'Segmento cadastrado com sucesso!');
         }
@@ -60,6 +70,9 @@ class SegmentController extends Controller
      */
     public function edit(string $uuid)
     {
+        if(!empty(Auth::user()->associate_id)){
+            abort(403, 'Acesso não autorizado');
+        }
         $data = $this->segment->get($uuid);
         return view('segment.edit', compact('data'));
     }
@@ -73,6 +86,9 @@ class SegmentController extends Controller
      */
     public function update(Request $request, $uuid)
     {
+        if(!empty(Auth::user()->associate_id)){
+            abort(403, 'Acesso não autorizado');
+        }
         if ($this->segment->update($uuid, $request->all())) {
             return redirect(route('segment.index'))->with('alert-success', 'Segmento atualizado com sucesso!');
         }
@@ -87,6 +103,9 @@ class SegmentController extends Controller
      */
     public function delete(Request $request)
     {
+        if(!empty(Auth::user()->associate_id)){
+            abort(403, 'Acesso não autorizado');
+        }
         if ($this->segment->delete($request->category)) {
             return redirect(route('segment.index'))->with('alert-success', 'Registro removido com sucesso!');
         }

@@ -1,11 +1,13 @@
 <div class="container-fluid">
-    <div class="row">
-        <div class="col-12 my-2">
-            <div class="alert alert-secondary text-center">
-                <strong>Atenção:</strong> Inscrições efetuadas pelo painel administrativo não terão processamento de pagamento.
+    @if(empty(Auth::user()->associate_id))
+        <div class="row">
+            <div class="col-12 my-2">
+                <div class="alert alert-secondary text-center">
+                    <strong>Atenção:</strong> Inscrições efetuadas pelo painel administrativo não terão processamento de pagamento.
+                </div>
             </div>
         </div>
-    </div>
+    @endif
     <div class="row">
         <div class="col-12 col-md-6 form-group">
             <label for="award" class="form-label da-required">Premiação</label>
@@ -13,7 +15,7 @@
                 <option value="">Selecione...</option>
                 @if (isset($awards))
                     @foreach ($awards as $award)
-                        <option value="{{ $award->id }}" {{ (isset($enrollment) && $enrollment->award_id == $award->id) ? "selected" : "" }}>
+                        <option value="{{ $award->id }}" {{ ((isset($enrollment) && $enrollment->award_id == $award->id ) || (Award::active() == $award->id)) ? "selected" : "" }}>
                             {{ $award->name }}
                         </option>
                     @endforeach
@@ -26,7 +28,7 @@
                 <option value="">Selecione...</option>
                 @if (isset($associates))
                     @foreach ($associates as $associate)
-                        <option value="{{ $associate->id }}" {{ (isset($enrollment) && $enrollment->associate_id == $associate->id) ? "selected" : "" }}>
+                        <option value="{{ $associate->id }}" {{ ((isset($enrollment) && $enrollment->associate_id == $associate->id) || (Auth::user()->associate_id == $associate->id)) ? "selected" : "" }}>
                             @if ($associate->type == "legal")
                                 {{ $associate->fantasy_name }}
                             @else
@@ -50,15 +52,20 @@
         </div>
         <div class="col-12 col-md-6 form-group">
             <label for="status" class="form-label da-required">Status</label>
-            <select name="status" class="form-control" id="status" required>
-                <option value="" selected="">Selecion...</option>
-                <option value="pending" {{ isset($enrollment) && $enrollment->status == "pending" ? "selected" : "" }}>Pagamento Pendente</option>
-                <option value="approve" {{ isset($enrollment) && $enrollment->status == "approve" ? "selected" : "" }}>Aprovado</option>
-                <option value="on-hold" {{ isset($enrollment) && $enrollment->status == "on-hold" ? "selected" : "" }}>Aguardando</option>
-                <option value="cancelled" {{ isset($enrollment) && $enrollment->status == "cancelled" ? "selected" : "" }}>Cancelado</option>
-                <option value="refunded" {{ isset($enrollment) && $enrollment->status == "refunded" ? "selected" : "" }}>Reembolsado</option>
-                <option value="failed" {{ isset($enrollment) && $enrollment->status == "failed" ? "selected" : "" }}>Malsucedido</option>
-            </select>
+            <input type="hidden" name="status" value="draft">
+            <input type="text" class="form-control" disabled value="Em Criação">
+            @empty(Auth::user()->associate_id)
+                <select name="status" class="form-control" id="status" required>
+                    <option value="" selected="">Selecion...</option>
+                    <option value="pending" {{ isset($enrollment) && $enrollment->status == "pending" ? "selected" : "" }}>Pagamento Pendente</option>
+                    <option value="approve" {{ isset($enrollment) && $enrollment->status == "approve" ? "selected" : "" }}>Aprovado</option>
+                    <option value="on-hold" {{ isset($enrollment) && $enrollment->status == "on-hold" ? "selected" : "" }}>Aguardando</option>
+                    <option value="cancelled" {{ isset($enrollment) && $enrollment->status == "cancelled" ? "selected" : "" }}>Cancelado</option>
+                    <option value="refunded" {{ isset($enrollment) && $enrollment->status == "refunded" ? "selected" : "" }}>Reembolsado</option>
+                    <option value="failed" {{ isset($enrollment) && $enrollment->status == "failed" ? "selected" : "" }}>Malsucedido</option>
+                    <option value="draft" {{ isset($enrollment) && $enrollment->status == "draft" ? "selected" : "" }}>Em criação</option>
+                </select>
+            @endempty
         </div>
     </div>
 
@@ -118,8 +125,10 @@
         <div class="col-12 text-center mt-5">
             <input type="hidden" name="note_type" value="manual">
             <input type="hidden" name="note" value="{{ Auth::user()->name }} registrou a inscrição.">
-            <button type="submit" class="btn btn-success" title="Salvar Alterações">Salvar</button>
+
             <a href="{{ route('enrollment.index') }}" class="btn btn-secondary" title="Voltar">Voltar</a>
+            <button type="button" class="btn btn-primary" id="conclude_btn" title="Salvar e efetuar pagamento">Salvar e Finalizar</button>
+            <button type="submit" class="btn btn-success" title="Salvar Alterações">Salvar</button>
         </div>
     </div>
 
@@ -127,7 +136,35 @@
 
 @push('scripts')
 <script src="{{ asset('assets/js/enrollment.js') }}"></script>
-@if (isset($enrollment))
+
+<script>
+    (function($) {
+        $(function() {
+            $('#conclude_btn').on('click', function(e) {
+                e.preventDefault();
+                const button = $(this);
+                Swal.fire({
+                    icon: 'question',
+                    title: 'Deseja realmente finalizar essa incrição e efetuar o pagamento?',
+                    showCancelButton: true,
+                    confirmButtonText: 'Sim',
+                    cancelButtonText: `Não`,
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        $('#form_enrollment').attr("action",
+                            "{{ route('enrollment.store', ['checkout' => 'payment']) }}"
+                        );
+                        $('#status').val('pending');
+                        $('#form_enrollment').submit();
+                    }
+                })
+            });
+        });
+    })(jQuery);
+</script>
+
+
+@if (isset($enrollment) && $enrollment->status != 'draft')
 <script>
     (function($){
         $(function(){
