@@ -17,7 +17,7 @@ class RateController extends Controller
      */
     public function index(Request $request)
     {
-        $rates = Rate::join('awards', 'awards.id', 'rates.award_id')->where('awards.uuid', $request->award)->get();
+        $rates = Rate::join('awards', 'awards.id', 'rates.award_id')->where('awards.uuid', $request->award)->paginate(20);
         return view('rate.index', compact('rates', 'request'));
     }
 

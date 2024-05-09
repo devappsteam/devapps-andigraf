@@ -284,7 +284,7 @@ class EnrollmentController extends Controller
             if (!Str::isUuid($request->enrollment)) {
                 return redirect()->back()->with('alert-error', 'Inscrição inválida ou inexistente.');
             }
-            $enrollment = Enrollment::where('uuid', $request->user)->first();
+            $enrollment = Enrollment::where('uuid', $request->enrollment)->first();
             if (!$enrollment) {
                 return redirect()->back()->with('alert-error', 'Inscrição inválida ou inexistente.');
             }
