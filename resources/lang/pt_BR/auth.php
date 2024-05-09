@@ -13,7 +13,7 @@ return [
     |
     */
 
-    'failed' => 'Essas credenciais não correspondem com os nossos registros.',
+    'failed' => 'Essas credenciais não correspondem com os nossos registros. Procure nosso atendimento no WhatsApp: (81) 8272-9523 ou por e-mail: contato@andigraf.com.br que informaremos novos acessos.',
     'throttle' => 'Você realizou muitas tentativas de login. Por favor, tente novamente em :seconds segundos.',
 
 ];

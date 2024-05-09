@@ -73,7 +73,7 @@ class RegisterController extends Controller
             $associate = new Associate();
             $associate->uuid                    = Str::uuid()->toString();
             $associate->type                    = $data['type'];
-            $associate->document                = $data['document'];
+            $associate->document                = preg_replace("/\D/", '', $data['document']);
             $associate->corporate_name          = $data['company_name'] ?? null;
             $associate->fantasy_name            = $data['company_name'] ?? null;
             $associate->responsible_first_name  = $data['responsible_name'] ?? null;

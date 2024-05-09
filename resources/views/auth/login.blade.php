@@ -48,11 +48,11 @@
                                         <input type="password" name="password" class="form-control" autocomplete="off" minlength="6" required>
                                     </div>
                                 </div>
-                                <div class="row">
+                                <!--<div class="row">
                                     <div class="col-12 form-group text-right">
                                         <a href="#" class="text-link">Esqueceu a senha?</a>
                                     </div>
-                                </div>
+                                </div>-->
                                 <div class="row">
                                     <div class="col-12 text-center">
                                         <button type="submit" class="btn btn-primary w-100">Entrar</button>
@@ -61,11 +61,20 @@
                                         <a href="{{ route('register') }}" class="btn btn-success fon w-100 mt-3">Registrar-se</a>
                                     </div>
                                 </div>
+                                <div class="row">
+                                    <div class="col-12 mt-3">
+                                        <div class="alert alert-secondary font-weight-bold">
+                                            Caso precise de ajuda do nosso atendimento, acesse o nosso WhatsApp: (81) 8272-9523 ou por e-mail: contato@andigraf.com.br informando seu NOME, CNPJ ou CPF, EMAIL e TELEFONE DE CONTATO que responderemos o mais rápido possível.
+                                        </div>
+                                    </div>
+                                </div>
                             </form>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
+
+
     </body>
 </html>

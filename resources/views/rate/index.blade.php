@@ -180,6 +180,9 @@
             </div>
         </div>
     </div>
+
+    @include('components.paginator', ['data' => $rates])
+
     <!-- Modal -->
     <div class="modal fade" id="modal_rate" tabindex="-1">
         <div class="modal-dialog">

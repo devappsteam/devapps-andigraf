@@ -206,6 +206,9 @@
             </div>
         </div>
     </div>
+
+    @include('components.paginator', ['data' => $awards])
+
     <form id="form_delete" method="post" action="{{ route('award.delete') }}">
         @csrf
         @method('delete')

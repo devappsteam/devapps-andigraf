@@ -183,6 +183,9 @@
             </div>
         </div>
     </div>
+
+    @include('components.paginator', ['data' => $users])
+
     <form id="form_delete" method="post" action="{{ route('user.delete') }}">
         @csrf
         @method('delete')

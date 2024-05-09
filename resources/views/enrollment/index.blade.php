@@ -169,7 +169,6 @@
                                 @endforeach
                             </tbody>
                         </table>
-                        {{ $enrollments->appends(request()->query())->links('layouts.partials.paginate') }}
                     @else
                         <div class="d-flex-align-items-center justify-content-center w-100 h-100 text-center py-5">
                             <svg xmlns="http://www.w3.org/2000/svg" width="200" height="200"
@@ -296,6 +295,9 @@
             </div>
         </div>
     </div>
+
+    @include('components.paginator', ['data' => $enrollments])
+
     <form id="form_delete" method="post" action="{{ route('enrollment.delete') }}">
         @csrf
         @method('delete')
