@@ -31,7 +31,11 @@
                             </div>
                             <form method="post" action="{{ route('login') }}" class="da-form" autocomplete="off" role="presentation" enctype="utf-8">
                                 @csrf
-
+                                <div class="row">
+                                    <div class="col-12 my-1">
+                                        @include('layouts.partials.alerts')
+                                    </div>
+                                </div>
                                 <div class="row">
                                     <div class="col-12 form-group">
                                         <label for="email" class="form-label da-required text-muted">E-mail</label>
@@ -54,7 +58,7 @@
                                         <button type="submit" class="btn btn-primary w-100">Entrar</button>
                                     </div>
                                     <div class="col-12 text-center">
-                                        <a href="{{ route('associate.public.index') }}" class="btn btn-success fon w-100 mt-3">Associar-se</a>
+                                        <a href="{{ route('register') }}" class="btn btn-success fon w-100 mt-3">Registrar-se</a>
                                     </div>
                                 </div>
                             </form>

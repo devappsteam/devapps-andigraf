@@ -21,7 +21,7 @@ class HomeController extends Controller
 
             $totals = $this->get_totals();
             $enrollments = $this->get_last_enrollments();
-            
+
             if(empty(Auth::user()->associate_id)){
                 return view('dashboard', compact('totals', 'enrollments'));
             }else{
@@ -50,7 +50,7 @@ class HomeController extends Controller
             'total_incomplete' => Associate::where('status', 'incomplete')->count(),
             'total_site' => Associate::where('origin', 'site')->count(),
             'total_award' => Associate::where('origin', 'award')->count(),
-            'total_manual' => Associate::where('origin', 'manual')->count(),
+            'total_email' => Associate::where('email', '<>', '')->count(),
         );
     }
 
@@ -59,7 +59,7 @@ class HomeController extends Controller
         if(!empty(Auth::user()->associate_id)){
             return Enrollment::with('associate:id,first_name,fantasy_name,type')->where('award_id', $this->award_id)->where('associate_id', Auth::user()->associate_id)->orderBy('created_at', 'DESC')->limit(10)->get();
         }
-        return Enrollment::with('associate:id,first_name,fantasy_name,type')->where('award_id', $this->award_id)->orderBy('created_at', 'DESC')->limit(10)->get();
+        return Enrollment::with('associate:id,first_name,fantasy_name,type')->where('award_id', $this->award_id)->where('status', '<>', 'draft')->orderBy('created_at', 'DESC')->limit(10)->get();
     }
 
     private function get_award_active()

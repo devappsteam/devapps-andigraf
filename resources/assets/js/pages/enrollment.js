@@ -13,8 +13,8 @@
                 beforeSend: function () {
                     $('#product').html('<option value="">Selecione...</option>');
                     $('#product').prop('disabled', true);
-                    $('#table_product tbody').find('tr').not('#empty').remove();
-                    $('#table_product tbody').find('#empty').show();
+                    //$('#table_product tbody').find('tr').not('#empty').remove();
+                    //$('#table_product tbody').find('#empty').show();
                     $('#loading').show();
                 },
                 success: function (response) {
@@ -39,6 +39,7 @@
                 $('#table_product tbody').append(`
                     <tr id="item_${product.id}">
                         <input type="hidden" name="products[]" value="${product.id}">
+                        <td class="text-truncate">${product.id.toString().padStart(8, 0)}</td>
                         <td class="text-truncate">${product.name}</td>
                         <td>${product.conclude}</td>
                         <td class="text-truncate">${product.client}</td>

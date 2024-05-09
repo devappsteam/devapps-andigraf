@@ -1,7 +1,6 @@
 (function ($) {
-    // DOM Loaded
-    document.addEventListener("DOMContentLoaded", function () {
-        // Enable Tooltip
+    $(function () {
         $('[data-toggle="tooltip"]').tooltip();
+        $('[data-toggle="popover"]').popover();
     });
 })(jQuery);

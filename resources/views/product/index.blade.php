@@ -7,11 +7,10 @@
                 <h3 class="da-page__title">Produtos</h3>
                 <div class="d-flex">
                     <button class="btn btn-primary" id="btn_filter">Filtrar</button>
-                    <a href="{{ route('product.create') }}" class="btn btn-primary font-weight-bold ml-2"
-                        title="Cadastrar">Cadastrar Produto</a>
-                    <button type="submit" class="btn btn-primary ml-2" title="Gerar Etiquetas" form="form_ticket">Gerar
-                        Etiquetas</button>
+                    <a href="{{ route('product.create') }}" class="btn btn-primary font-weight-bold ml-2" title="Cadastrar">Cadastrar Produto</a>
+
                     @if (empty(Auth::user()->associate_id))
+                        <button type="submit" class="btn btn-primary ml-2" title="Gerar Etiquetas" form="form_ticket">Gerar Etiquetas</button>
                         <button type="button" class="btn btn-primary ml-2" data-toggle="modal" data-target="#export_form">Exportar</button>
                     @endif
                 </div>

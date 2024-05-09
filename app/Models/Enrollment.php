@@ -43,7 +43,7 @@ class Enrollment extends Model
      */
     public function notes()
     {
-        return $this->hasMany(EnrollmentNote::class);
+        return $this->hasMany(EnrollmentNote::class)->orderBy('id', 'DESC');
     }
 
     /**

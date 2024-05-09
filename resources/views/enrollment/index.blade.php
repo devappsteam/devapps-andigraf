@@ -16,6 +16,16 @@
                 @include('layouts.partials.alerts')
             </div>
         </div>
+        <div class="row">
+            <div class="col-12">
+                <div class="alert alert-secondary">
+                    <h4 class="alert-heading">ATENÇÃO:</h4>
+                    <p>Para participar da premiação, é necessário concluir a inscrição e efetuar o pagamento.</p>
+                    <hr>
+                    <p class="mb-0">Inscrições em processo de criação não participarão da premiação. Os associados podem adicionar e remover produtos apenas nas inscrições que estão em processo de criação.</p>
+                </div>
+            </div>
+        </div>
         <div class="row" style="{{ !isset($_GET['associate']) ? "display:none;" : "" }}" id="form_filter">
             <div class="col-12 mt-3">
                 <form method="get">

@@ -3,11 +3,11 @@
     <div class="row">
         <div class="col-12 col-md-6 form-group">
             <label for="award" class="form-label da-required">Premiação</label>
-            <select name="award" class="form-control" id="award" required>
+            <select name="award" class="form-control" id="award" required {{ !empty(Auth::user()->associate_id) ? 'readonly' : '' }}>
                 <option value="">Selecione...</option>
                 @if (isset($awards))
                     @foreach ($awards as $award)
-                        <option value="{{ $award->id }}" {{ (isset($product) && $product->award_id == $award->id) ? "selected" : "" }}>
+                        <option value="{{ $award->id }}" {{ ((isset($product) && $product->award_id == $award->id) || (Award::active() == $award->id)) ? "selected" : "" }}>
                             {{ $award->name }}
                         </option>
                     @endforeach
@@ -16,11 +16,11 @@
         </div>
         <div class="col-12 col-md-6 form-group">
             <label for="associate" class="form-label da-required">Associado</label>
-            <select name="associate" class="form-control" id="associate" required>
+            <select name="associate" class="form-control" id="associate" required {{ !empty(Auth::user()->associate_id) ? 'readonly' : '' }}>
                 <option value="">Selecione...</option>
                 @if (isset($associates))
                     @foreach ($associates as $associate)
-                        <option value="{{ $associate->id }}" {{ (isset($product) && $product->associate_id == $associate->id) ? "selected" : "" }}>
+                        <option value="{{ $associate->id }}" {{ ((isset($product) && $product->associate_id == $associate->id) || (Auth::user()->associate_id == $associate->id)) ? "selected" : "" }}>
                             @if ($associate->type == "legal")
                                 {{ $associate->fantasy_name }}
                             @else

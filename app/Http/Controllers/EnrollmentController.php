@@ -7,6 +7,7 @@ use App\Models\Award;
 use App\Models\Enrollment;
 use App\Models\EnrollmentNote;
 use App\Models\PrintProcess;
+use App\Models\Product;
 use App\Models\ProductCategory;
 use App\Traits\Award as TraitsAward;
 use Exception;
@@ -32,21 +33,21 @@ class EnrollmentController extends Controller
                 'award:id,name'
             ]);
 
-            if(empty(Auth::user()->associate_id)){
-                if(isset($request->associate) && !empty($request->associate)){
+            if (empty(Auth::user()->associate_id)) {
+                if (isset($request->associate) && !empty($request->associate)) {
                     $enrollments = $enrollments->where('associate_id', $request->associate);
                 }
 
-                if(isset($request->search) && !empty($request->search)){
+                if (isset($request->search) && !empty($request->search)) {
                     $enrollments = $enrollments->where('id', $request->search);
                 }
-            }else{
+            } else {
                 $enrollments = $enrollments->where('associate_id', Auth::user()->associate_id);
             }
 
             if (isset($request->award) && !empty($request->award)) {
                 $enrollments = $enrollments->where('award_id', $request->award);
-            }else{
+            } else {
                 $enrollments = $enrollments->where('award_id', TraitsAward::active());
             }
 
@@ -54,7 +55,7 @@ class EnrollmentController extends Controller
 
             if (empty(Auth::user()->associate_id)) {
                 $associates = Associate::distinct()->where('status', 'complete')->orderBy('first_name', 'ASC')->orderBy('corporate_name', 'ASC')->get();
-            }else{
+            } else {
                 $associates = [Associate::where('id', Auth::user()->associate_id)->first()];
             }
 
@@ -76,7 +77,7 @@ class EnrollmentController extends Controller
         try {
             if (empty(Auth::user()->associate_id)) {
                 $associates = Associate::distinct()->where('status', 'complete')->orderBy('first_name', 'ASC')->orderBy('corporate_name', 'ASC')->get();
-            }else{
+            } else {
                 $associates = [Associate::where('id', Auth::user()->associate_id)->first()];
             }
             $awards = Award::orderBy('name')->get();
@@ -97,9 +98,9 @@ class EnrollmentController extends Controller
         DB::beginTransaction();
         try {
 
-            if(!empty(Auth::user()->associate_id)){
+            if (!empty(Auth::user()->associate_id)) {
                 $associate = Auth::user()->associate_id;
-            }else{
+            } else {
                 $associate = $request->associate;
             }
 
@@ -120,7 +121,7 @@ class EnrollmentController extends Controller
                 'type' => $request->note_type
             ));
             DB::commit();
-            return redirect()->back()->with('alert-success', 'Inscrição cadastrada com sucesso!');
+            return redirect()->route('enrollment.edit', ['uuid' => $enrollment->uuid])->with('alert-success', 'Inscrição cadastrada com sucesso!');
         } catch (Exception $ex) {
             DB::rollBack();
             dd($ex->getMessage());
@@ -148,8 +149,8 @@ class EnrollmentController extends Controller
             }
 
             if (empty(Auth::user()->associate_id)) {
-                $associates = Associate::distinct()->where('status', 'complete')->orderBy('first_name', 'ASC')->orderBy('corporate_name', 'ASC')->get();
-            }else{
+                $associates = Associate::distinct()->orderBy('first_name', 'ASC')->orderBy('corporate_name', 'ASC')->get();
+            } else {
                 $associates = [Associate::where('id', Auth::user()->associate_id)->first()];
             }
             $awards = Award::orderBy('name')->get();
@@ -182,12 +183,18 @@ class EnrollmentController extends Controller
             $enrollment->payment_type = $request->payment_type;
             $enrollment->status = $request->status;
             $enrollment->save();
+            $enrollment->products()->sync($request->products);
             $enrollment->notes()->create(array(
                 'uuid' => Str::uuid()->toString(),
                 'note' => "Inscrição atualizada por " . Auth::user()->name,
                 'type' => "manual"
             ));
             DB::commit();
+
+            if($request->checkout){
+                return redirect()->route('enrollment.checkout', ['uuid' => $enrollment->uuid]);
+            }
+
             return redirect()->back()->with('alert-success', 'Inscrição atualizada com sucesso!');
         } catch (Exception $ex) {
             DB::rollBack();
@@ -288,4 +295,36 @@ class EnrollmentController extends Controller
         }
     }
 
+    public function checkout(string $uuid)
+    {
+        try {
+            if (!Str::isUuid($uuid)) {
+                return redirect()->back()->with('alert-error', 'Inscrição inválida ou inexistente.');
+            }
+            $enrollment = Enrollment::with('associate', 'award')->withCount('products')->where('uuid', $uuid)->first();
+            if (!$enrollment || $enrollment->associate_id != Auth::user()->associate_id) {
+                return redirect()->back()->with('alert-error', 'Inscrição inválida ou inexistente.');
+            }
+
+            return view('enrollment.checkout', compact('enrollment'));
+        } catch (Exception $ex) {
+        }
+    }
+
+    public function update_temp(string $uuid)
+    {
+        try {
+            if (!Str::isUuid($uuid)) {
+                return redirect()->back()->with('alert-error', 'Inscrição inválida ou inexistente.');
+            }
+            $enrollment = Enrollment::where('uuid', $uuid)->first();
+            if (!$enrollment || $enrollment->associate_id != Auth::user()->associate_id) {
+                return redirect()->back()->with('alert-error', 'Inscrição inválida ou inexistente.');
+            }
+            $enrollment->status = 'approve';
+            $enrollment->save();
+            return redirect()->route('enrollment.index')->with('alert-success', 'Pagamento processado com sucesso. Inscrição aprovada.');
+        } catch (Exception $ex) {
+        }
+    }
 }

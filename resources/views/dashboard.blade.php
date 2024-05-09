@@ -20,7 +20,7 @@
                         <div class="da-box__count">{{ $totals['associates'] ?? 0 }}</div>
                         <div class="da-box__title">Associados&nbsp;
                             <span class="da--pointer" data-toggle="popover" data-placement="bottom"
-                                data-content="<b>Cadastros Completos: <span class='text-danger'>{{ $totals['total_complete'] ?? 0 }}</span><br>Cadastros Incompletos: <span class='text-danger'>{{ $totals['total_incomplete'] ?? 0 }}</span><br>Cadastros do Site: <span class='text-danger'>{{ $totals['total_site'] ?? 0 }}</span><br>Cadastros de premiações: <span class='text-danger'>{{ $totals['total_award'] ?? 0 }}</span><br>Cadastros manuais: <span class='text-danger'>{{ $totals['total_manual'] ?? 0 }}</span></b>"
+                                data-content="<b>Cadastros Completos: <span class='text-danger'>{{ $totals['total_complete'] ?? 0 }}</span><br>Cadastros Incompletos: <span class='text-danger'>{{ $totals['total_incomplete'] ?? 0 }}</span><br>Cadastros do Site: <span class='text-danger'>{{ $totals['total_site'] ?? 0 }}</span><br>Cadastros de premiações: <span class='text-danger'>{{ $totals['total_award'] ?? 0 }}</span><br>Cadastros com E-mail: <span class='text-danger'>{{ $totals['total_email'] ?? 0 }}</span></b>"
                                 data-trigger="hover" data-html="true">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
                                     class="bi bi-info-circle-fill" viewBox="0 0 16 16">

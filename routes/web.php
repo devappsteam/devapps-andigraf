@@ -24,9 +24,7 @@ use Illuminate\Support\Facades\Storage;
 |
 */
 
-Route::auth([
-    'register' => false
-]);
+Route::auth();
 
 Route::get('/', function () {
     return redirect(route('painel'));
@@ -114,6 +112,8 @@ Route::middleware('auth')->group(function () {
         Route::post('/salvar', [EnrollmentController::class, 'store'])->name('enrollment.store');
         Route::put('/atualizar/{uuid}', [EnrollmentController::class, 'update'])->name('enrollment.update');
         Route::delete('/apagar', [EnrollmentController::class, 'delete'])->name('enrollment.delete');
+        Route::get('/checkout/{uuid}', [EnrollmentController::class, 'checkout'])->name('enrollment.checkout');
+        Route::get('/update/temp/{uuid}', [EnrollmentController::class, 'update_temp'])->name('enrollment.update_temp');
     });
 
     Route::prefix('/usuario')->group(function () {
