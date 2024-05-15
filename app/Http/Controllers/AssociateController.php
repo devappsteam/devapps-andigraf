@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Storage;
 
 class AssociateController extends Controller
 {
@@ -306,6 +307,16 @@ class AssociateController extends Controller
             dd($ex->getMessage());
         }
     }
+
+    public function upload_image(Request $request)
+    {
+        $path = $request->file('image')->store('newsletter', ['disk' => 'public']);
+        return response()->json([
+            'status' => true,
+            'url' => Storage::url($path)
+        ]);
+    }
+
 
     public function send_mail(Request $request)
     {

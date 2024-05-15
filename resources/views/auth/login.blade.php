@@ -48,11 +48,11 @@
                                         <input type="password" name="password" class="form-control" autocomplete="off" minlength="6" required>
                                     </div>
                                 </div>
-                                <!--<div class="row">
+                                <div class="row">
                                     <div class="col-12 form-group text-right">
-                                        <a href="#" class="text-link">Esqueceu a senha?</a>
+                                        <a href="{{ route('password.request') }}" class="text-link">Esqueceu a senha?</a>
                                     </div>
-                                </div>-->
+                                </div>
                                 <div class="row">
                                     <div class="col-12 text-center">
                                         <button type="submit" class="btn btn-primary w-100">Entrar</button>

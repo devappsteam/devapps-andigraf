@@ -197,7 +197,7 @@ class ProductController extends Controller
             $product->note = $request->note;
             $product->save();
             $product->print_processes()->sync($request->print_process);
-            return redirect()->back()->with('alert-success', 'Produto atualizado com sucesso!');
+            return redirect()->back()->with('alert-success', 'Produto foi atualizado com sucesso!');
         } catch (Exception $ex) {
             dd($ex->getMessage());
         }

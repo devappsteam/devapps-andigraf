@@ -14,6 +14,7 @@
         "laravel/tinker": "^2.5",
         "laravel/ui": "3.*",
         "maatwebsite/excel": "^3.1",
+        "mercadopago/dx-php": "^3.0",
         "proner/phppimaco": "^1.4"
     },
     "require-dev": {

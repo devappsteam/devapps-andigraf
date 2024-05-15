@@ -135,14 +135,58 @@
                 placeholder: 'Digite aqui o conteúdo do seu e-mail.',
                 theme: 'snow',
                 modules: {
-                    toolbar: toolbarOptions
+                    toolbar: toolbarOptions,
                 }
             });
 
             editor.on('text-change', function(delta, oldDelta, source) {
                 $('#content').val(editor.container.firstChild.innerHTML);
+
+                console.log(editor.container.firstChild.innerHTML);
             });
 
+            function selectLocalImage() {
+                const input = document.createElement('input');
+                input.setAttribute('type', 'file');
+                input.click();
+
+                // Listen upload local image and save to server
+                input.onchange = () => {
+                    const file = input.files[0];
+
+                    // file type is only image.
+                    if (/^image\//.test(file.type)) {
+                        saveToServer(file);
+                    } else {
+                        console.warn('You could only upload images.');
+                    }
+                };
+            }
+
+            function saveToServer(file) {
+                const fd = new FormData();
+                fd.append('_token', "{{ csrf_token() }}");
+                fd.append('image', file);
+
+                const xhr = new XMLHttpRequest();
+                xhr.open("POST", "{{ route('associate.newsletter.upload') }}", true);
+                xhr.onload = () => {
+                    if (xhr.status === 200) {
+                        const url = JSON.parse(xhr.responseText).url;
+                        insertToEditor(url);
+                    }
+                };
+                xhr.send(fd);
+            }
+
+            function insertToEditor(url) {
+                const range = editor.getSelection();
+                editor.insertEmbed(range.index, 'image', `{{ config('app.url') }}${url}`, Quill.sources.USER);
+            }
+
+            editor.getModule('toolbar').addHandler('image', () => {
+                selectLocalImage();
+            });
 
         })(window, document, jQuery);
     </script>

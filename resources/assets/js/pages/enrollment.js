@@ -25,6 +25,12 @@
                     }
                     $('#product').prop('disabled', false);
                     $('#loading').hide();
+
+                    if($('#table_product').find('tbody tr').not('#empty').length > 0 || response.data.length > 0){
+                        $('#conclude_btn').show();
+                    }
+
+
                 }
             });
         });

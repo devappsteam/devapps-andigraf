@@ -6,6 +6,8 @@ try {
     window.Swal = require('sweetalert2');
     require('bootstrap');
     require('jquery-mask-plugin');
+    window.Choices = require('choices.js');
+    window.Quill = require('quill');
 } catch (e) { }
 
 /**

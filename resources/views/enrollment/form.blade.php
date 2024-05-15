@@ -47,6 +47,7 @@
     </div>
 
     <div class="row">
+        @empty(Auth::user()->associate_id)
         <div class="col-12 col-md-6 form-group">
             <label for="payment_type" class="form-label da-required">Meio de Pagamento</label>
             <select name="payment_type" class="form-control" id="payment_type" required>
@@ -58,6 +59,7 @@
                     {{ isset($enrollment) && $enrollment->payment_type == 'pix' ? 'selected' : '' }}>PIX</option>
             </select>
         </div>
+        @endempty
         <div class="col-12 col-md-6 form-group">
             <label for="status" class="form-label da-required">Status</label>
             @empty(Auth::user()->associate_id)
@@ -137,7 +139,7 @@
                         @endforeach
                     @else
                         <tr id="empty">
-                            <td colspan="4" class="text-center">Nenhum produto adicionado.</td>
+                            <td colspan="5" class="text-center">Nenhum produto cadastrado.</td>
                         </tr>
                     @endif
                 </tbody>
@@ -153,7 +155,7 @@
             <a href="{{ route('enrollment.index') }}" class="btn btn-secondary" title="Voltar">Voltar</a>
             <button type="submit" class="btn btn-success" title="Salvar Alterações">Salvar e Continuar</button>
             @if(!empty(Auth::user()->associate_id))
-            <button type="button" class="btn btn-danger" id="conclude_btn"
+            <button type="button" class="btn btn-danger" id="conclude_btn" style="display: none"
                 title="Salvar e efetuar pagamento">Salvar e Finalizar</button>
             @endif
         </div>
@@ -173,6 +175,16 @@
                 $('#conclude_btn').on('click', function(e) {
                     e.preventDefault();
                     const button = $(this);
+
+                    if($('#table_product').find('tbody tr').not('#empty').length == 0){
+                        Swal.fire({
+                            icon: 'info',
+                            title: 'Cadastre e adicione na listagem pelo menos 1 (um) produto.',
+                            showCancelButton: false,
+                        });
+                        return;
+                    }
+
                     Swal.fire({
                         icon: 'question',
                         title: 'Deseja realmente finalizar essa incrição e efetuar o pagamento?',

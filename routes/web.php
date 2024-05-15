@@ -87,6 +87,7 @@ Route::middleware('auth')->group(function () {
         Route::post('/usuario/{uuid}', [AssociateController::class, 'user_update'])->name('associate.user.update');
         Route::get('/newsletter', [AssociateController::class, 'newsletter'])->name('associate.newsletter');
         Route::post('/newsletter/send', [AssociateController::class, 'send_mail'])->name('associate.newsletter.send');
+        Route::post('/newsletter/upload', [AssociateController::class, 'upload_image'])->name('associate.newsletter.upload');
     });
 
 
@@ -113,7 +114,9 @@ Route::middleware('auth')->group(function () {
         Route::put('/atualizar/{uuid}', [EnrollmentController::class, 'update'])->name('enrollment.update');
         Route::delete('/apagar', [EnrollmentController::class, 'delete'])->name('enrollment.delete');
         Route::get('/checkout/{uuid}', [EnrollmentController::class, 'checkout'])->name('enrollment.checkout');
-        Route::get('/update/temp/{uuid}', [EnrollmentController::class, 'update_temp'])->name('enrollment.update_temp');
+        //Route::get('/update/temp/{uuid}', [EnrollmentController::class, 'update_temp'])->name('enrollment.update_temp');
+        Route::post('/pagamento/{uuid}',[EnrollmentController::class, 'payment'])->name('enrollment.payment');
+        Route::post('/produto',[EnrollmentController::class, 'product'])->name('enrollment.product.store');
     });
 
     Route::prefix('/usuario')->group(function () {

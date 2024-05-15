@@ -7,7 +7,7 @@
                 <h3 class="da-page__title">Inscrições</h3>
                 <div class="d-flex">
                     <button class="btn btn-primary" id="btn_filter">Filtrar</button>
-                    <a href="{{ route('enrollment.create') }}" class="btn btn-primary font-weight-bold ml-2" title="Cadastrar Inscrição">Fazer Inscrição</a>
+                    <a href="{{ route('enrollment.create') }}" class="btn btn-primary font-weight-bold ml-2" title="Fazer Inscrição">Faça sua Inscrição</a>
                 </div>
             </div>
         </div>
@@ -19,10 +19,9 @@
         <div class="row">
             <div class="col-12">
                 <div class="alert alert-secondary">
-                    <h4 class="alert-heading">ATENÇÃO:</h4>
-                    <p>Para participar da premiação, é necessário concluir a inscrição e efetuar o pagamento.</p>
-                    <hr>
-                    <p class="mb-0">Inscrições em processo de criação não participarão da premiação. Os associados podem adicionar e remover produtos apenas nas inscrições que estão em processo de criação.</p>
+                    <h4 class="alert-heading font-weight-bold">ATENÇÃO:</h4>
+                    <p class="mb-0">Os <b>inscritos</b> podem adicionar e remover produtos apenas nas inscrições que estão em processo de criação.</p>
+                    <p>Inscrições em processo de criação não participarão da premiação.</p>
                 </div>
             </div>
         </div>
@@ -106,7 +105,7 @@
                                         @switch($enrollment->status)
                                             @case('draft')
                                             @default
-                                                <span class="badge badge-info">Em Criação</span>
+                                                <span class="badge badge-info text-white">Em Criação</span>
                                             @break
                                             @case('pending')
                                                 <span class="badge badge-primary">Pendente</span>
@@ -131,6 +130,11 @@
                                     </td>
                                     <td class="text-right">
                                         @if($enrollment->status != 'draft')
+                                        <a href="{{ route('enrollment.checkout', [ 'uuid' => $enrollment->uuid]) }}" class="btn btn-sm btn-success">
+                                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" width="16" height="16">
+                                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v12m-3-2.818.879.659c1.171.879 3.07.879 4.242 0 1.172-.879 1.172-2.303 0-3.182C13.536 12.219 12.768 12 12 12c-.725 0-1.45-.22-2.003-.659-1.106-.879-1.106-2.303 0-3.182s2.9-.879 4.006 0l.415.33M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                                            </svg>
+                                        </a>
                                         <a href="{{ route('enrollment.registers', $enrollment->uuid) }}" class="btn btn-primary btn-sm" target="_blank">
                                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-card-checklist" viewBox="0 0 16 16">
                                                 <path d="M14.5 3a.5.5 0 0 1 .5.5v9a.5.5 0 0 1-.5.5h-13a.5.5 0 0 1-.5-.5v-9a.5.5 0 0 1 .5-.5h13zm-13-1A1.5 1.5 0 0 0 0 3.5v9A1.5 1.5 0 0 0 1.5 14h13a1.5 1.5 0 0 0 1.5-1.5v-9A1.5 1.5 0 0 0 14.5 2h-13z"/>

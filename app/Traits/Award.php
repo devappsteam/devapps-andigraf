@@ -6,12 +6,12 @@ use App\Models\Award as ModelsAward;
 
 trait Award
 {
-    static function active()
+    static function active($return_id = true)
     {
-        $award = ModelsAward::select('id')->where('status', 'enable')->first();
-        if ($award) {
+        $award = ModelsAward::where('status', 'enable')->first();
+        if ($return_id) {
             return $award->id;
         }
-        return null;
+        return $award;
     }
 }

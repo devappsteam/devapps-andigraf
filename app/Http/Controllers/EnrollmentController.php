@@ -15,6 +15,11 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
+use App\Traits\Enrollment as EnrollmentTrait;
+use MercadoPago\Client\Common\RequestOptions;
+use MercadoPago\Client\Payment\PaymentClient;
+use MercadoPago\Exceptions\MPApiException;
+use MercadoPago\MercadoPagoConfig;
 
 class EnrollmentController extends Controller
 {
@@ -76,12 +81,19 @@ class EnrollmentController extends Controller
     {
         try {
             if (empty(Auth::user()->associate_id)) {
+                $awards = Award::orderBy('name')->get();
                 $associates = Associate::distinct()->where('status', 'complete')->orderBy('first_name', 'ASC')->orderBy('corporate_name', 'ASC')->get();
+                return view('enrollment.create', compact('associates', 'awards'));
             } else {
-                $associates = [Associate::where('id', Auth::user()->associate_id)->first()];
+                $award = TraitsAward::active();
+                $enrollment = new Enrollment();
+                $enrollment->uuid = Str::uuid()->toString();
+                $enrollment->award_id = $award;
+                $enrollment->associate_id = Auth::user()->associate_id;
+                $enrollment->status = 'draft';
+                $enrollment->save();
+                return redirect()->route('enrollment.edit', ['uuid' => $enrollment->uuid]);
             }
-            $awards = Award::orderBy('name')->get();
-            return view('enrollment.create', compact('associates', 'awards'));
         } catch (Exception $ex) {
             dd($ex->getMessage());
         }
@@ -108,11 +120,10 @@ class EnrollmentController extends Controller
             $enrollment->uuid = Str::uuid()->toString();
             $enrollment->award_id = $request->award;
             $enrollment->associate_id = $associate;
-            $enrollment->payment_type = $request->payment_type;
+            $enrollment->payment_type = $request->payment_type ?? 'credit_card';
             $enrollment->status = $request->status;
-            $enrollment->discount = $request->discount ?? 0;
-            $enrollment->subtotal = $request->subtotal ?? 0;
-            $enrollment->total = $request->total ?? 0;
+            $enrollment->discount = 0;
+            $enrollment->subtotal = 0;
             $enrollment->save();
             $enrollment->products()->sync($request->products);
             $enrollment->notes()->create(array(
@@ -121,6 +132,7 @@ class EnrollmentController extends Controller
                 'type' => $request->note_type
             ));
             DB::commit();
+
             return redirect()->route('enrollment.edit', ['uuid' => $enrollment->uuid])->with('alert-success', 'Inscrição cadastrada com sucesso!');
         } catch (Exception $ex) {
             DB::rollBack();
@@ -144,19 +156,49 @@ class EnrollmentController extends Controller
                 'products',
                 'notes'
             ])->where('uuid', $uuid)->first();
+
             if (!$enrollment) {
                 return redirect()->back()->with('alert-error', 'Inscrição inválida ou inexistente.');
             }
 
             if (empty(Auth::user()->associate_id)) {
                 $associates = Associate::distinct()->orderBy('first_name', 'ASC')->orderBy('corporate_name', 'ASC')->get();
+                $awards = Award::orderBy('name')->get();
+                return view('enrollment.edit', compact('enrollment', 'associates', 'awards'));
             } else {
-                $associates = [Associate::where('id', Auth::user()->associate_id)->first()];
+                $print_processes = PrintProcess::orderBy('name')->get();
+                $categories = ProductCategory::orderBy('name')->get();
+                return view('enrollment.associate', compact('enrollment', 'print_processes', 'categories'));
             }
-            $awards = Award::orderBy('name')->get();
-
-            return view('enrollment.edit', compact('enrollment', 'associates', 'awards'));
         } catch (Exception $ex) {
+            dd($ex->getMessage());
+        }
+    }
+
+    public function product(Request $request)
+    {
+        DB::beginTransaction();
+        try {
+            $product = new Product();
+            $product->uuid = Str::uuid()->toString();
+            $product->award_id = $request->award;
+            $product->associate_id = $request->associate;
+            $product->product_category_id = $request->category;
+            $product->name = $request->name;
+            $product->client = $request->client;
+            $product->conclude = $request->conclude;
+            $product->special_features = $request->special_features;
+            $product->substrate = $request->substrate;
+            $product->note = $request->note;
+            $product->save();
+            $product->print_processes()->sync($request->print_process);
+
+            $enrollment = Enrollment::where('id', $request->enrollment)->first();
+            $enrollment->products()->attach($product->id);
+            DB::commit();
+            return redirect()->back()->with('alert-success', 'Seu produto foi adicionado com sucesso! Continue adicionando mais produtos, se desejar.');
+        } catch (Exception $ex) {
+            DB::rollBack();
             dd($ex->getMessage());
         }
     }
@@ -180,18 +222,26 @@ class EnrollmentController extends Controller
                 return redirect()->back()->with('alert-error', 'Inscrição inválida ou inexistente.');
             }
 
-            $enrollment->payment_type = $request->payment_type;
+            $enrollment->payment_type = $request->payment_type ?? 'credit_card';
             $enrollment->status = $request->status;
             $enrollment->save();
-            $enrollment->products()->sync($request->products);
-            $enrollment->notes()->create(array(
-                'uuid' => Str::uuid()->toString(),
-                'note' => "Inscrição atualizada por " . Auth::user()->name,
-                'type' => "manual"
-            ));
+            if(!$request->checkout){
+                $enrollment->products()->sync($request->products);
+                $enrollment->notes()->create(array(
+                    'uuid' => Str::uuid()->toString(),
+                    'note' => "Inscrição atualizada por " . Auth::user()->name,
+                    'type' => "manual"
+                ));
+            }else{
+                $enrollment->notes()->create(array(
+                    'uuid' => Str::uuid()->toString(),
+                    'note' => $request->note,
+                    'type' => "system"
+                ));
+            }
             DB::commit();
 
-            if($request->checkout){
+            if ($request->checkout) {
                 return redirect()->route('enrollment.checkout', ['uuid' => $enrollment->uuid]);
             }
 
@@ -301,7 +351,9 @@ class EnrollmentController extends Controller
             if (!Str::isUuid($uuid)) {
                 return redirect()->back()->with('alert-error', 'Inscrição inválida ou inexistente.');
             }
-            $enrollment = Enrollment::with('associate', 'award')->withCount('products')->where('uuid', $uuid)->first();
+            $enrollment = Enrollment::with([
+                'associate', 'award.rates'
+            ])->withCount('products')->where('uuid', $uuid)->first();
             if (!$enrollment || $enrollment->associate_id != Auth::user()->associate_id) {
                 return redirect()->back()->with('alert-error', 'Inscrição inválida ou inexistente.');
             }
@@ -310,6 +362,7 @@ class EnrollmentController extends Controller
         } catch (Exception $ex) {
         }
     }
+
 
     public function update_temp(string $uuid)
     {
@@ -325,6 +378,115 @@ class EnrollmentController extends Controller
             $enrollment->save();
             return redirect()->route('enrollment.index')->with('alert-success', 'Pagamento processado com sucesso. Inscrição aprovada.');
         } catch (Exception $ex) {
+        }
+    }
+
+    public function payment(Request $request, string $uuid)
+    {
+        try {
+            if (!Str::isUuid($uuid)) {
+                return redirect()->back()->with('alert-error', 'Inscrição inválida ou inexistente.');
+            }
+            $enrollment = Enrollment::where('uuid', $uuid)->first();
+            if (!$enrollment || $enrollment->associate_id != Auth::user()->associate_id) {
+                return redirect()->back()->with('alert-error', 'Inscrição inválida ou inexistente.');
+            }
+
+            MercadoPagoConfig::setAccessToken(config('payment.mercado_pago.access_token'));
+            $client = new PaymentClient();
+            $request_options = new RequestOptions();
+            $request_options->setCustomHeaders(["X-Idempotency-Key: $enrollment->uuid"]);
+
+
+            $data = $this->getDataByPaymentType($request);;
+            $payment = $client->create($data);
+
+            $this->validate_payment_result($payment);
+
+            $enrollment->transaction = $payment->id;
+            switch ($payment->status) {
+                case 'pending':
+                    $enrollment->status = 'pending';
+                    break;
+                case 'approved':
+                    $enrollment->status = 'approve';
+                    break;
+                case 'inprocess':
+                case 'inmediation':
+                    $enrollment->status = 'on-hold';
+                    break;
+                case 'rejected':
+                    $enrollment->status = 'failed';
+                    break;
+                case 'refunded':
+                case 'chargedback':
+                    $enrollment->status = 'refunded';
+                    break;
+                case 'cancelled':
+                    $enrollment->status = 'cancelled';
+                    break;
+            }
+            $enrollment->save();
+
+            $response_fields = array(
+                'id' => $payment->id,
+                'status' => $payment->status,
+                'detail' => $payment->status_detail
+            );
+            return response()->json($payment);
+        } catch (MPApiException $ex) {
+            $response_fields = array('error_message' => $ex->getApiResponse());
+            return response()->json($response_fields);
+            //dd($ex->getApiResponse());
+        }
+    }
+
+    private function getDataByPaymentType($request)
+    {
+        switch ($request->payment_method_id) {
+            case 'pix':
+            case 'bolbradesco':
+            case 'pec':
+                return [
+                    "transaction_amount" => (float) $request->transaction_amount,
+                    "description" => $request->description ?? "",
+                    "payment_method_id" => $request->payment_method_id,
+                    "payer" => [
+                        "email" => $request->payer['email'],
+                    ]
+                ];
+                break;
+            default:
+                return [
+                    "description" => $request->description ?? "",
+                    "token" => $request->token,
+                    "issuer_id" => $request->issuer_id,
+                    "payment_method_id" => $request->payment_method_id,
+                    "transaction_amount" => (float) $request->transaction_amount,
+                    "installments" => $request->installments,
+                    "payer" => [
+                        "email" => $request->payer['email'],
+                        "identification" => [
+                            "type" => $request->payer['identification']['type'],
+                            "number" => $request->payer['identification']['number'],
+                        ]
+                    ]
+                ];
+                break;
+        }
+    }
+
+    function validate_payment_result($payment)
+    {
+        if ($payment->id === null) {
+            $error_message = 'Unknown error cause';
+
+            if ($payment->error !== null) {
+                $sdk_error_message = $payment->error->message;
+                $error_message = $sdk_error_message !== null ? $sdk_error_message : $error_message;
+            }
+
+            throw new Exception($error_message);
         }
     }
 }

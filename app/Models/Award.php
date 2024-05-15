@@ -9,4 +9,9 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 class Award extends Model
 {
     use HasFactory, SoftDeletes;
+
+    public function rates()
+    {
+        return $this->hasMany(Rate::class);
+    }
 }
